@@ -1,0 +1,250 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        tools:context="roblin_m.cardlistsample.AddEditPaymentMethodActivity"
+
+        android:id="@+id/rootview"
+        >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:focusable="true"
+        >
+
+        <TextView
+        android:layout_width="100dp"
+        android:layout_height="45dp"
+        android:text="@string/labelyourname"
+        android:id="@+id/yourname"
+        android:gravity="center_vertical"
+        />
+
+        <EditText
+            android:layout_width="230dp"
+            android:layout_height="45dp"
+            android:layout_toEndOf="@+id/yourname"
+            android:layout_toRightOf="@+id/yourname"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/yournametxt"
+            android:imeOptions="actionNext"
+            android:editable="false"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="45dp"
+            android:text="@string/labelyouradress"
+            android:layout_below="@id/yourname"
+            android:id="@+id/youradress"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:layout_width="230dp"
+            android:layout_height="45dp"
+            android:layout_toEndOf="@+id/youradress"
+            android:layout_toRightOf="@+id/youradress"
+            android:layout_below="@id/yournametxt"
+            android:digits="@string/address_digits"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/youradresstxt"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="45dp"
+            android:text="@string/labelyourcomplement"
+            android:layout_below="@id/youradress"
+            android:id="@+id/yourcomplement"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:layout_width="230dp"
+            android:layout_height="45dp"
+            android:layout_toEndOf="@+id/yourcomplement"
+            android:layout_toRightOf="@+id/yourcomplement"
+            android:layout_below="@id/youradresstxt"
+            android:digits="@string/address_digits"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/yourcomplementtxt"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="45dp"
+            android:text="@string/labelyourcp"
+            android:layout_below="@id/yourcomplement"
+            android:id="@+id/yourcp"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:layout_width="230dp"
+            android:layout_height="45dp"
+            android:layout_toEndOf="@+id/yourcp"
+            android:layout_toRightOf="@+id/yourcp"
+            android:layout_below="@id/yourcomplementtxt"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/yourcptxt"
+            android:maxLength="5"
+            android:inputType="number"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="45dp"
+            android:text="@string/labelyourcity"
+            android:layout_below="@id/yourcp"
+            android:id="@+id/yourcity"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:layout_width="230dp"
+            android:layout_height="45dp"
+            android:layout_toEndOf="@+id/yourcity"
+            android:layout_toRightOf="@+id/yourcity"
+            android:layout_below="@id/yourcptxt"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/yourcitytxt"
+            android:digits="@string/address_digits"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="45dp"
+            android:text="@string/labelyourcountry"
+            android:layout_below="@id/yourcity"
+            android:id="@+id/yourcountry"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:layout_width="230dp"
+            android:layout_height="45dp"
+            android:layout_toEndOf="@+id/yourcountry"
+            android:layout_toRightOf="@+id/yourcountry"
+            android:layout_below="@id/yourcitytxt"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/yourcountrytxt"
+            android:imeOptions="actionNext"
+            android:text="FRANCE"
+            android:editable="false"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="45dp"
+            android:text="@string/labelyouremail"
+            android:layout_below="@id/yourcountry"
+            android:id="@+id/youremail"
+            android:gravity="center_vertical"
+            />
+
+        <EditText
+            android:layout_width="230dp"
+            android:layout_height="45dp"
+            android:layout_toEndOf="@+id/youremail"
+            android:layout_toRightOf="@+id/youremail"
+            android:layout_below="@id/yourcountrytxt"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/youremailtxt"
+            android:imeOptions="actionNext"
+            android:lines="1"
+            android:maxLines="1"
+            android:editable="false"
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:scrollHorizontally="true"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:text="@string/labelyourphonenumber"
+            android:layout_below="@id/youremail"
+            android:id="@+id/labelyourphonenumber"
+            android:gravity="center"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:text="@string/labelyourphonesecurity"
+            android:layout_below="@id/labelyourphonenumber"
+            android:id="@+id/labelyourphonesecurity"
+            android:gravity="center"
+            />
+
+
+        <ListView
+        android:id="@+id/list"
+        android:layout_below="@id/labelyourphonesecurity"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+    </ListView>
+
+    </RelativeLayout>
+    </ScrollView>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="bottom">
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/dialog_cancel">
+        </Button>
+
+        <Button
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" android:text="@string/dialog_save">
+        </Button>
+    </LinearLayout>
+</FrameLayout>

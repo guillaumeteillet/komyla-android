@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView android:text="@string/hint_payement_with_unique_code" android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/hint" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/uniqueCode"
+        android:inputType="textCapCharacters"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:layout_below="@+id/hint"
+        android:layout_centerHorizontal="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_ok"
+        android:id="@+id/okay"
+        android:layout_marginTop="40dp"
+        android:layout_below="@+id/uniqueCode"
+        android:layout_centerHorizontal="true" />
+</RelativeLayout>

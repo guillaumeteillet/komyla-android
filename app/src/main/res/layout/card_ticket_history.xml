@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="5dp"
+    card_view:cardCornerRadius="5dp"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#FFFFFF"
+        >
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/e_l2012b"
+            android:id="@+id/companyLogo"
+            />
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/ic_store_white_24dp"
+            android:background="@android:color/holo_orange_dark"
+            />
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="20dp"
+            android:textSize="13sp"
+            android:layout_toRightOf="@+id/companyLogo"
+            android:layout_marginLeft="3dp"
+            android:textColor="#606060"
+            android:text="01/01/1111"
+            android:textStyle="bold"
+            android:layout_marginTop="3dp"
+            />
+
+        <TextView
+            android:id="@+id/ticketAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:text="50€"
+            android:textColor="#96c479"
+            />
+
+        <TextView
+            android:id="@+id/paymentMethodName"
+            android:gravity="center|left"
+            android:background="?android:selectableItemBackground"
+            android:focusable="true"
+            android:clickable="true"
+            android:layout_marginLeft="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:textSize="24sp"
+            android:layout_centerInParent="true"
+            android:textColor="@android:color/white"
+            />
+
+        <TextView
+            android:id="@+id/products"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_centerInParent="true"
+            />
+
+
+    </RelativeLayout>
+
+</android.support.v7.widget.CardView>

@@ -1,0 +1,12 @@
+/.gradle
+
+/local.properties
+
+/.idea/libraries
+/.idea/workspace.xml
+
+/app/build
+
+/facebook/build
+
+/build

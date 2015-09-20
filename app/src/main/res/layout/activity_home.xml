@@ -1,0 +1,71 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="#FFFFFF"
+    android:id="@+id/activity">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:id="@+id/logo"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/logo_komyla"/>
+
+    <Button
+        style="?android:textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:text="@string/connectwithlizzaccount"
+        android:id="@+id/btnConnectLizz"
+        android:background="#646464"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/logo"
+        android:layout_centerHorizontal="true"
+        android:textColor="#FFFFFF"/>
+
+    <Button
+        style="?android:textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:text="@string/createnewlizzaccount"
+        android:id="@+id/btnNewAccountLizz"
+        android:layout_below="@+id/btnConnectLizz"
+        android:background="#646464"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="#FFFFFF"/>
+
+    <com.facebook.widget.LoginButton
+        xmlns:fb="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/btnConnectFB"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="#3a5a95"
+        android:layout_below="@+id/btnNewAccountLizz"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:contentDescription="ICI"
+        android:scaleType="centerInside"
+        fb:login_text="@string/facebook"
+        fb:logout_text="@string/facebook_wait" />
+
+    <Button
+        android:id="@+id/plus_sign_in_button"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/btnConnectFB"
+        android:text="@string/common_signin_button_text_long"
+        android:textColor="#ffffff"/>
+
+
+
+</RelativeLayout>

@@ -1,0 +1,200 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    tools:context="roblin_m.cardlistsample.AddEditPaymentMethodActivity"
+
+    android:id="@+id/rootview"
+        >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:focusable="true"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/labelCardName"
+            android:id="@+id/textviewCardNumber"
+            android:gravity="center"
+            />
+
+        <EditText
+            android:layout_width="180dp"
+            android:layout_height="40dp"
+            android:layout_toEndOf="@id/textviewCardNumber"
+            android:layout_toRightOf="@id/textviewCardNumber"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:id="@+id/edittextCardNumber"
+            android:maxLength="16"
+            android:inputType="number"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            />
+
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_action_camera"
+            android:layout_toRightOf="@id/edittextCardNumber"
+            android:id="@+id/buttonScanCard"
+            android:onClick="onScanPress"
+            />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/labelExpirationDate"
+            android:id="@+id/textviewExpirationDate"
+            android:gravity="center"
+            android:layout_below="@id/textviewCardNumber"
+            android:layout_marginTop="10dp"
+            />
+
+        <EditText
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_toEndOf="@+id/textviewExpirationDate"
+            android:layout_toRightOf="@+id/textviewExpirationDate"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/edittextCardNumber"
+            android:hint="@string/hint_expiration_month"
+            android:id="@+id/edittextExpirationDateMonth"
+            android:maxLength="2"
+            android:inputType="number"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            />
+
+        <EditText
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_toEndOf="@+id/textviewExpirationDate"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@id/edittextCardNumber"
+            android:hint="@string/hint_expiration_year"
+            android:id="@+id/edittextExpirationDateYear"
+            android:maxLength="2"
+            android:inputType="number"
+            android:layout_toRightOf="@+id/edittextExpirationDateMonth"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/labelCryptogram"
+            android:id="@+id/textviewCryptogram"
+            android:gravity="center"
+            android:layout_below="@id/textviewExpirationDate"
+            android:layout_marginTop="10dp"
+            />
+
+        <EditText
+            android:layout_width="110dp"
+            android:layout_height="40dp"
+            android:id="@+id/edittextCryptogram"
+            android:hint="@string/hint_cryptogram"
+            android:layout_toEndOf="@+id/textviewExpirationDate"
+            android:layout_toRightOf="@+id/textviewExpirationDate"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@id/edittextExpirationDateMonth"
+            android:layout_marginTop="10dp"
+            android:maxLength="3"
+            android:inputType="number"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/labelCardOwnerName"
+            android:id="@+id/textviewOwnerName"
+            android:gravity="center"
+            android:layout_below="@id/textviewCryptogram"
+            android:layout_marginTop="10dp"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/edittextOwnerName"
+            android:layout_toEndOf="@+id/textviewExpirationDate"
+            android:layout_toRightOf="@+id/textviewExpirationDate"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:digits="@string/name_digits"
+            android:layout_below="@id/edittextCryptogram"
+            android:layout_marginTop="10dp"
+            android:focusable="true"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/labelAccountDisplayName"
+            android:id="@+id/textviewDisplayName"
+            android:gravity="center"
+            android:layout_below="@id/textviewOwnerName"
+            android:layout_marginTop="10dp"
+            />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:id="@+id/edittextDisplayName"
+            android:layout_toEndOf="@+id/textviewExpirationDate"
+            android:layout_toRightOf="@+id/textviewExpirationDate"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_below="@id/edittextOwnerName"
+            android:layout_marginTop="10dp"
+            android:singleLine="true"
+            android:focusable="true"
+            android:imeOptions="actionDone"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonSaveCard"
+            android:layout_below="@id/textviewDisplayName"
+            android:layout_marginTop="20dp"
+            android:layout_centerHorizontal="true"
+            android:text="@string/buttonSaveCardData"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonDeleteCard"
+            android:layout_below="@id/buttonSaveCard"
+            android:layout_centerHorizontal="true"
+            android:text="@string/buttonDeleteCardData"
+            />
+
+    </RelativeLayout>
+</ScrollView>
+

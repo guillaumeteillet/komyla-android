@@ -1,0 +1,18 @@
+<resources>
+        <string name="title_activity_login">Connexion à Lizz</string>
+        <string name="title_activity_register">Créer un compte Lizz</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">E-mail</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="action_sign_in">Connexion</string>
+    <string name="action_register">Créer un compte Komyla</string>
+    <string name="action_sign_in_short">Connexion à Komyla</string>
+
+    <string name="error_invalid_email">Cette adresse email est invalide</string>
+    <string name="error_invalid_password">Ce mot de passe est trop petit</string>
+    <string name="error_invalid_password2">Doit contenir au moins une lettre et un chiffre</string>
+    <string name="error_incorrect_password">Ce mot de passe est incorrect</string>
+    <string name="error_field_required">Ce champ est obligatoire</string>
+    <string name="error_password_politic">Le mot de passe doit contenir 8 caractères (1 lettre et 1 chiffre minimum.)</string>
+</resources>
