@@ -219,7 +219,8 @@ public class HistoryListFragment extends Fragment {
                                 p.getString("createdAt"),
                                 p.getString("updatedAt")));
                     }
-                    carts.add(new Cart(productsList, t, cart.getString("shopName"), cart.getString("createdAt")));
+                    //carts.add(new Cart(productsList, t, cart.getString("shopName"), cart.getString("createdAt")));
+                    carts.add(new Cart());
                 }
                 mCarts = carts;
                 Log.e("GetTicketsFromAPI", "Le code de retour est: " + responseCode + " et le contenu est: " + UApi.convertStreamToString(l_inputStream));

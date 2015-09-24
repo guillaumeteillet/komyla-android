@@ -155,9 +155,17 @@ public class ScanQRCodeActivity extends ActionBarActivity
                             if (contents.length() >= 27) {
                                 String urlLizzOrNot = contents.substring(0, 27);
                                 if (urlLizzOrNot.equals(getResources().getString(R.string.urllizzcode))) {
-                                    final boolean isInternet = UNetwork.checkInternetConnection(getBaseContext());
+
+                                    final String productCode = contents.replace(getResources().getString(R.string.urllizzcode), "");
+
+                                    Intent resultIntent = new Intent();
+                                    resultIntent.putExtra("ProductURL", productCode);
+                                    setResult(Activity.RESULT_OK, resultIntent);
+                                    finish();
+
+                                    /*final boolean isInternet = UNetwork.checkInternetConnection(getBaseContext());
                                     final boolean isMobile = UNetwork.isMobileAvailable(getBaseContext());
-                                   /* MediaPlayer mp = MediaPlayer.create(ScanQRCodeActivity.this, R.raw.beep);
+                                   *//* MediaPlayer mp = MediaPlayer.create(ScanQRCodeActivity.this, R.raw.beep);
                                     mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 
                                         @Override
@@ -167,7 +175,7 @@ public class ScanQRCodeActivity extends ActionBarActivity
                                         }
 
                                     });
-                                    mp.start(); */
+                                    mp.start(); *//*
                                     final String unique_code = contents.replace(getResources().getString(R.string.urllizzcode), "");
                                     if (isInternet)
                                     {
@@ -177,21 +185,6 @@ public class ScanQRCodeActivity extends ActionBarActivity
                                             public void run()
                                             {
                                                 analyzeQRCode(progress, unique_code);
-
-                                                /*GetTransactionFromAPI mAuthTask = new GetTransactionFromAPI(sharedpreferences.getString("eip.com.lizz._csrf", ""), getBaseContext(), unique_code);
-                                                mAuthTask.setOnTaskFinishedEvent(new GetTransactionFromAPI.OnTaskExecutionFinished() {
-
-                                                    @Override
-                                                    public void OnTaskFihishedEvent(final HttpResponse httpResponse) {
-                                                        new Thread(new Runnable() {
-                                                            @Override
-                                                            public void run() {
-                                                                dataAPI(progress, httpResponse, unique_code);
-                                                            }
-                                                        }).start();
-                                                    }
-                                                });
-                                                mAuthTask.execute();*/
                                             }
                                         }).start();
                                     }
@@ -217,7 +210,8 @@ public class ScanQRCodeActivity extends ActionBarActivity
                                             }
                                         });
                                         alert.show();
-                                    }
+                                    }*/
+
                                 } else {
                                     errorQRCode();
                                 }

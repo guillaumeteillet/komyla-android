@@ -42,8 +42,8 @@ public class TicketHistoryAdapter extends RecyclerView.Adapter<TicketHistoryAdap
     @Override
     public void onBindViewHolder(TicketHistoryViewHolder paymentMethodViewHolder, int i) {
         paymentMethodViewHolder.paymentMethod = mCarts.get(i);
-        paymentMethodViewHolder.date.setText(mCarts.get(i).getCreatedAt());
-        paymentMethodViewHolder.ticketAmount.setText(mCarts.get(i).getAmount().toString() + "€ ");
+        /*paymentMethodViewHolder.date.setText(mCarts.get(i).getCreatedAt());
+        paymentMethodViewHolder.ticketAmount.setText(mCarts.get(i).getAmount().toString() + "€ ");*/
         //paymentMethodViewHolder.shopName.setText(mCarts.get(i).getShopName());
 
         String str = "";
