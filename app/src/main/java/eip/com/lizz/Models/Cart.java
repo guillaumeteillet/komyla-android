@@ -9,6 +9,8 @@ public class                        Cart {
 
     private String                  _shopName = null;
     private ArrayList<Product>      _products = new ArrayList<>();
+    private Transaction             _transaction = null;
+    private String                  _createdAt = null;
 
     public                          Cart() {
 
@@ -20,7 +22,16 @@ public class                        Cart {
         }
     }
 
-    public void                     clear() { _products.clear(); }
+    public                          Cart(ArrayList<Product> products, Transaction transaction,
+                                         String shopName, String createdAt) {
+
+        setProducts(products);
+        setTransaction(transaction);
+        setShopName(shopName);
+        setCreatedAt(createdAt);
+    }
+
+    public void clear() { _products.clear(); }
 
     // ShopName related methods
     public String                   getShopName() {
@@ -31,6 +42,9 @@ public class                        Cart {
     }
 
     // Products related methods
+    public void                     setProducts(ArrayList<Product> products) {
+        this._products = products;
+    }
     public ArrayList<Product>       getProducts() {
         return this._products;
     }
@@ -58,6 +72,17 @@ public class                        Cart {
         }
         return total;
 
+    }
+
+    public void                     setTransaction(Transaction transaction) {
+        this._transaction = transaction;
+    }
+
+    public void             setCreatedAt(String createdAt) {
+        this._createdAt = " " + createdAt.substring(0, 10);
+    }
+    public String           getCreatedAt() {
+        return this._createdAt;
     }
 
 
