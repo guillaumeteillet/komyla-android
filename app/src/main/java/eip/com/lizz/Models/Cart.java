@@ -14,6 +14,14 @@ public class                        Cart {
 
     }
 
+    public                          Cart(Cart cart) {
+        for (Product product : cart.getProducts()) {
+            _products.add(product);
+        }
+    }
+
+    public void                     clear() { _products.clear(); }
+
     // ShopName related methods
     public String                   getShopName() {
         return this._shopName;
@@ -23,7 +31,7 @@ public class                        Cart {
     }
 
     // Products related methods
-    public List<Product>            getProducts() {
+    public ArrayList<Product>       getProducts() {
         return this._products;
     }
     public Product                  getProductAt(int index) {

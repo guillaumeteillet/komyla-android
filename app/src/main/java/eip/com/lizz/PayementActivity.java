@@ -76,41 +76,23 @@ public class PayementActivity extends ActionBarActivity {
         if (isLogged) {
 
             final Bundle bundle = getIntent().getExtras();
-            if (bundle != null) {
-                if (bundle.getString("unique_code") != null) {
-                    unique_code = bundle.getString("unique_code");
-                } else {
-                    Toast.makeText(getBaseContext(), getResources().getString(R.string.no_unique_code), Toast.LENGTH_LONG).show();
-                    finish();
-                }
-                if (bundle.getString("data") != null) {
-                    data = bundle.getString("data");
-                    Log.d("TEST", data);
-                    try {
-                        byte[] data_bytes = Base64.decode(data, Base64.DEFAULT);
-                        String url = new String(data_bytes, "UTF-8");
-                        Log.d(">>>>", url);
-                        String[] params = url.split("&");
-
-                        String[] nom = params[0].split("=");
-                        sommeTxt = params[2].split("=");
-
-                        TextView shopName = (TextView) findViewById(R.id.name_shop);
-                        shopName.setText(nom[1]);
-
-
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    Toast.makeText(getBaseContext(), getResources().getString(R.string.no_data), Toast.LENGTH_LONG).show();
-                    finish();
-                }
-            }
-            else {
+            if (bundle == null) {
                 Toast.makeText(getBaseContext(), getResources().getString(R.string.no_unique_code), Toast.LENGTH_LONG).show();
                 finish();
             }
+
+            /*if (bundle.getString("productArray") == null) {
+                Toast.makeText(getBaseContext(), "Il n'y a pas de productArray", Toast.LENGTH_LONG).show();
+                finish();
+            }
+
+            if (bundle.getString("total") == null) {
+                Toast.makeText(getBaseContext(), "Il n'y a pas de total", Toast.LENGTH_LONG).show();
+                finish();
+            }*/
+
+            TextView shopName = (TextView) findViewById(R.id.name_shop);
+            shopName.setText("E.Leclerc");
 
             final Button payementMethod = (Button) findViewById(R.id.paiementmethod);
             payementMethod.setOnClickListener(new View.OnClickListener() {
@@ -127,30 +109,10 @@ public class PayementActivity extends ActionBarActivity {
             });
 
             Button next = (Button) findViewById(R.id.payer);
-            next.setText("Payer " + sommeTxt[1] + " €");
+            next.setText("Payer " + bundle.getString("total") + " €");
             next.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-
-                   /* if (contact_a_check.isEmpty())
-                        UAlertBox.alertOk(PayementPTPActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_contact_empty));
-                    else if (somme.isEmpty())
-                        UAlertBox.alertOk(PayementPTPActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_somme_empty));
-                    else if (!isEmail && !isPhone)
-                        UAlertBox.alertOk(PayementPTPActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_contact_ptp));
-                    else if (id_payement.isEmpty())
-                        UAlertBox.alertOk(PayementPTPActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_id_payement));
-                    else
-                    {*/
-
-                        /*String id_payement = "12";
-                        String PIN = "4825";
-                        String email_user = "jean.dupont@gmail.com";
-                      //  unique_code = "3JS2B43N21";
-                        String id_user = "132";*/
-
                     checkNetwork(bundle);
-                    Log.d("PAIEMENT OK", "Paiement okk");
-                    //}
                 }
             });
         } else {
@@ -184,7 +146,6 @@ public class PayementActivity extends ActionBarActivity {
         }
         else
         {
-          //  popUpPIN(bundle);
             pay(bundle);
         }
     }
@@ -193,26 +154,25 @@ public class PayementActivity extends ActionBarActivity {
     {
         final SharedPreferences sharedpreferences = getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
 
-        final String id_payement_method = "1"; //payementMethodId();
+//        final String id_payement_method = "1"; //payementMethodId();
         final String PIN = sharedpreferences.getString("eip.com.lizz.codepinlizz", "");
-        final String receiver = bundle.getString("unique_code");
+//        final String receiver = bundle.getString("unique_code");
 
-        Log.d("DEBUG", "-->"+id_payement_method+"--"+PIN+"--"+receiver);
+//        Log.d("DEBUG", "-->"+id_payement_method+"--"+PIN+"--"+receiver);
         final Intent paiement = new Intent(getBaseContext(), PayementPTPFinishActivity.class);
-        paiement.putExtra("somme", amount);
-        paiement.putExtra("contact", bundle.getString("contact"));
-        paiement.putExtra("isEmail", bundle.getBoolean("isEmail"));
-        paiement.putExtra("isPhone", bundle.getBoolean("isPhone"));
-        paiement.putExtra("isInternet", bundle.getBoolean("isInternet"));
+
+        paiement.putExtra("somme", bundle.getString("total"));
+
         final EditText input = new EditText(getBaseContext());
         input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         input.setTransformationMethod(PasswordTransformationMethod.getInstance());
         input.setTextColor(Color.BLACK);
+
         final AlertDialog.Builder alert = UAlertBox.alertInputOk(PayementActivity.this, getResources().getString(R.string.dialog_title_confirm), getResources().getString(R.string.dialog_confirm_pin), input);
         alert.setPositiveButton(getResources().getString(R.string.dialog_ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //confirmTransaction(input, token, paiement, PIN, sharedpreferences);
-                confirmTransactionKomyla(input, paiement, PIN, sharedpreferences);
+                confirmTransactionKomyla(input, paiement, PIN, sharedpreferences, bundle.getString("productArray"));
             }
 
         });
@@ -316,13 +276,13 @@ public class PayementActivity extends ActionBarActivity {
         }
     }
 
-    public void confirmTransactionKomyla(EditText input, Intent paiement, String PIN, SharedPreferences sharedpreferences)
+    public void confirmTransactionKomyla(EditText input, Intent paiement, String PIN, SharedPreferences sharedpreferences, String productArray)
     {
         if (input.getText().toString().equals(PIN))
         {
             sharedpreferences.edit().putInt("eip.com.lizz.tentativePin", 0).apply();
             Log.d("DEBUG MODE", "PAIEMENT INTERNET");
-            sendTransactionToAPIKomyla(sharedpreferences, paiement, unique_code);
+            sendTransactionToAPIKomyla(sharedpreferences, paiement, productArray);
         }
         else
         {
@@ -330,7 +290,7 @@ public class PayementActivity extends ActionBarActivity {
         }
     }
 
-    private void sendTransactionToAPIKomyla(final SharedPreferences sharedpreferences, final Intent paiement, final String code) {
+    private void sendTransactionToAPIKomyla(final SharedPreferences sharedpreferences, final Intent paiement, final String productArray) {
         final ProgressDialog progress = ProgressDialog.show(PayementActivity.this, getResources().getString(R.string.pleasewait), getResources().getString(R.string.pleasewaitTransaction), true);
         new Thread(new Runnable() {
             @Override
@@ -340,7 +300,7 @@ public class PayementActivity extends ActionBarActivity {
                     @Override
                     public void run()
                     {
-                        SendTransactionToAPI mAuthTask = new SendTransactionToAPI(sharedpreferences.getString("eip.com.lizz._csrf", ""), getBaseContext(), code, "1");
+                        SendTransactionToAPI mAuthTask = new SendTransactionToAPI(sharedpreferences.getString("eip.com.lizz._csrf", ""), getBaseContext(), productArray);
                         mAuthTask.setOnTaskFinishedEvent(new SendTransactionToAPI.OnTaskExecutionFinished() {
 
                             @Override

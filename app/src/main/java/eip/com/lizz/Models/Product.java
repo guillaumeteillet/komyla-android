@@ -5,6 +5,7 @@ import java.util.Date;
 
 public class        Product {
 
+    private String  _code = null;
     private String  _name = null;
     private String  _desc = null;
     private Double  _price = 0.0;
@@ -24,13 +25,15 @@ public class        Product {
 //        setShoppingCart(shoppingCart);
     }
 
-    public          Product(String name, String desc, Double price, Integer quantity) {
+    public          Product(String code, String name, String desc, Double price, Integer quantity) {
+        setCode(code);
         setName(name);
         setDesc(desc);
         setPrice(price);
         setQuantity(quantity);
     }
 
+    public void     setCode(String code) { this._code = code; }
     public void     setName(String name) { this._name = name; }
     public void     setDesc(String desc) { this._desc = desc; }
     public void     setPrice(Double price) { this._price = Double.valueOf(price); }
@@ -40,6 +43,7 @@ public class        Product {
 //    public void     setCreatedAt(String createdAt) {}
 //    public void     setUpdatedAt(String updatedAt) {}
 
+    public String   getCode() { return this._code; }
     public String   getName() { return this._name; }
     public String   getDesc() { return this._desc; }
     public Double   getPrice() { return this._price; }

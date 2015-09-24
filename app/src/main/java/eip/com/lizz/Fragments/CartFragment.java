@@ -20,7 +20,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 import eip.com.lizz.CameraPreview;
 import eip.com.lizz.Models.Cart;
@@ -132,23 +137,14 @@ public class                            CartFragment extends Fragment {
 
         if(part_url[0].equals("d"))
         {
-            Log.d("RETOUR API", ">>> DIRECT >> " + code + "--" + data);
-            Intent payement = new Intent(getActivity(), PayementActivity.class);
-            payement.putExtra("unique_code", code);
-            payement.putExtra("data", data);
-            startActivity(payement);
-//            Log.d("CartFragment", "QRCode de Type Direct");
-//            Log.d("CartFragment", "Le code est :" + code);
-//            Log.d("CartFragment", "La data est :" + data);
-//            addProductToCart(decipherProductData(data));
-            // Paiement
+            Log.d("CartFragment", "Achat direct");
+            addProductToCart(code, decipherProductData(data));
+            doPaiement(true);
         }
         else if(part_url[0].equals("p"))
         {
-            Log.d("CartFragment", "QRCode de Type Panier");
-            Log.d("CartFragment", "Le code est :" + code);
-            Log.d("CartFragment", "La data est :" + data);
-            addProductToCart(decipherProductData(data));
+            Log.d("CartFragment", "Achat panier");
+            addProductToCart(code, decipherProductData(data));
         }
     }
 
@@ -165,7 +161,7 @@ public class                            CartFragment extends Fragment {
         return null;
     }
 
-    private void                        addProductToCart(String[] productParams) {
+    private void                        addProductToCart(String code, String[] productParams) {
         String                          productName = null,
                                         productDesc = null,
                                         productPrice = null,
@@ -199,7 +195,7 @@ public class                            CartFragment extends Fragment {
             }
         }
         if (productName != null && productPrice != null && productQuantity != null) {
-            Product product = new Product(productName, productDesc, Double.valueOf(productPrice),
+            Product product = new Product(code, productName, productDesc, Double.valueOf(productPrice),
                     1);
             this.mCart.addProduct(product);
             updateDisplay();
@@ -220,6 +216,41 @@ public class                            CartFragment extends Fragment {
             this.mEmptyCartTextView.setVisibility(View.INVISIBLE);
         }
         this.mAdapter.notifyDataSetChanged();
+    }
+
+    private void                    doPaiement(Boolean clear) {
+
+        Cart cart = new Cart(mCart);
+
+        if (clear) {
+            mCart.clear();
+            updateDisplay();
+        }
+
+        Intent payment = new Intent(getActivity(), PayementActivity.class);
+        payment.putExtra("productArray", convertCartToJson(cart).toString());
+        payment.putExtra("total", cart.getTotal().toString());
+        startActivity(payment);
+    }
+
+    private JSONArray              convertCartToJson(Cart cart) {
+
+        JSONArray productArray = new JSONArray();
+        JSONObject productObj = new JSONObject();
+
+        for (int i = 0; i < cart.getNumberOfProducts(); i++) {
+            Product product = cart.getProductAt(i);
+            try {
+                productObj.remove("productId");
+                productObj.remove("nbr");
+                productObj.put("productId", product.getCode());
+                productObj.put("nbr", product.getQuantity());
+                productArray.put(productObj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return productArray;
     }
 
 
@@ -306,7 +337,7 @@ public class                            CartFragment extends Fragment {
                 payButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.d("CardFragment", "Bouton payer");
+                        doPaiement(false);
                     }
                 });
             }

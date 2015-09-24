@@ -48,7 +48,7 @@ public class PayementPTPFinishActivity extends ActionBarActivity {
 
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) {
-                if (bundle.getString("contact") != null) {
+                /*if (bundle.getString("contact") != null) {
                     String contact = bundle.getString("contact");
                     String contactName = "", uri = "";
                     boolean isPhone = bundle.getBoolean("isPhone");
@@ -67,14 +67,16 @@ public class PayementPTPFinishActivity extends ActionBarActivity {
                         profil_picture.setImageResource(R.drawable.ic_launcher);
                     if(profil_picture.getDrawable() == null)
                         profil_picture.setImageResource(R.drawable.ic_launcher);
-                }
+                }*/
 
                 if (bundle.getString("somme") != null) {
                     String somme = bundle.getString("somme");
                     somme_label.setText(somme+" €");
                 }
 
-                if (bundle.getString("data") != null) {
+                name_destinataire.setText("E.Leclerc");
+
+                /*if (bundle.getString("data") != null) {
                     data = bundle.getString("data");
                     Log.d("TEST", data);
                     try {
@@ -99,7 +101,7 @@ public class PayementPTPFinishActivity extends ActionBarActivity {
                 } else {
                     Toast.makeText(getBaseContext(), getResources().getString(R.string.no_data), Toast.LENGTH_LONG).show();
                     finish();
-                }
+                }*/
 
             }
         }

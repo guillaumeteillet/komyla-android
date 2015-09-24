@@ -27,8 +27,7 @@ public class SendTransactionToAPI extends AsyncTask<Void, Void, HttpResponse> {
     private final String        _tokenCSRF;
     private final Context       _context;
     private List<Cookie>        _cookies;
-    private String              mCode;
-    private String              mQuantity;
+    private String              productArray;
 
     private OnTaskExecutionFinished _task_finished_event;
 
@@ -45,11 +44,10 @@ public class SendTransactionToAPI extends AsyncTask<Void, Void, HttpResponse> {
         }
     }
 
-    public SendTransactionToAPI(String _tokenCSRF, Context _context, String code, String quantity) {
+    public SendTransactionToAPI(String _tokenCSRF, Context _context, String productArray) {
         this._tokenCSRF = _tokenCSRF;
         this._context = _context;
-        mCode = code;
-        mQuantity = quantity;
+        this.productArray = productArray;
     }
 
 
@@ -70,12 +68,8 @@ public class SendTransactionToAPI extends AsyncTask<Void, Void, HttpResponse> {
         InputStream inputStream = null;
         try {
             JSONObject products = new JSONObject();
-            products.put("productId", mCode);
-            products.put("nbr", mQuantity);
 
-            JSONArray productArray = new JSONArray();
-
-            productArray.put(products);
+            JSONArray productArray = new JSONArray(this.productArray);
 
             JSONObject dataToSend = new JSONObject();
             dataToSend.put("_csrf", _tokenCSRF);
