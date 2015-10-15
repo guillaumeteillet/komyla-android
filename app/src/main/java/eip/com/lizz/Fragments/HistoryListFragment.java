@@ -225,7 +225,7 @@ public class HistoryListFragment extends Fragment {
                 mCarts = carts;
                 Log.e("GetTicketsFromAPI", "Le code de retour est: " + responseCode + " et le contenu est: " + UApi.convertStreamToString(l_inputStream));
             } catch (Exception e) {
-                mCarts.clear();
+                //mCarts.clear();
                 e.printStackTrace();
             } finally {
                 if (l_inputStream != null)

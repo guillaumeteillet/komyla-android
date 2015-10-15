@@ -311,13 +311,21 @@ public class                            CartFragment extends Fragment {
             public TextView productPrice;
             public TextView productTotalPrice;
 
+            public ImageButton reduceQuantity;
+            public ImageButton increaseQuantity;
+
             public ProductViewHolder(View itemView) {
                 super(itemView);
+
                 productQuantity = (TextView) itemView.findViewById(R.id.productQuantity);
                 productName = (TextView) itemView.findViewById(R.id.productName);
                 productDesc = (TextView) itemView.findViewById(R.id.productDesc);
                 productPrice = (TextView) itemView.findViewById(R.id.productPrice);
                 productTotalPrice = (TextView) itemView.findViewById(R.id.productTotalPrice);
+
+                reduceQuantity = (ImageButton) itemView.findViewById(R.id.reduceQuantity);
+                increaseQuantity = (ImageButton) itemView.findViewById(R.id.increaseQuantity);
+
                 itemView.setOnClickListener(this);
             }
             @Override
@@ -352,7 +360,7 @@ public class                            CartFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder viewHolder, int i) {
+        public void onBindViewHolder(ViewHolder viewHolder, final int i) {
             if (viewHolder instanceof ProductViewHolder) {
                 ((ProductViewHolder)viewHolder).productQuantity.setText(String.valueOf(mCart.getProductAt(i).getQuantity()));
                 ((ProductViewHolder)viewHolder).productName.setText(mCart.getProductAt(i).getName());
@@ -362,6 +370,23 @@ public class                            CartFragment extends Fragment {
                 ((ProductViewHolder)viewHolder).productTotalPrice.setText(
                         String.valueOf(mCart.getProductAt(i).getPrice() * mCart.getProductAt(i).getQuantity())
                                 .concat("€"));
+
+                ((ProductViewHolder)viewHolder).reduceQuantity.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mCart.getProductAt(i).removeUnit();
+                        updateDisplay();
+                    }
+                });
+
+                ((ProductViewHolder)viewHolder).increaseQuantity.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mCart.getProductAt(i).addUnit();
+                        updateDisplay();
+                    }
+                });
+
             }
             if (viewHolder instanceof PayButtonViewHolder) {
                 ((PayButtonViewHolder)viewHolder).payButton.setText("Payer " + String.valueOf(mCart.getTotal()).concat("€"));

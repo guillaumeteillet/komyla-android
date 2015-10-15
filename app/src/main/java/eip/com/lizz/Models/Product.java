@@ -38,14 +38,26 @@ public class        Product {
     public void     setDesc(String desc) { this._desc = desc; }
     public void     setPrice(Double price) { this._price = Double.valueOf(price); }
     public void     setQuantity(Integer quantity) { this._quantity = quantity; }
-//    public void     setProductId(String productId) { this._productId = productId; }
-//    public void     setShoppingCart(String shoppingCart) { this._shoppingCart = shoppingCart; }
-//    public void     setCreatedAt(String createdAt) {}
-//    public void     setUpdatedAt(String updatedAt) {}
+
+    public void     addUnit() {
+        if (this._quantity < 99)
+            this._quantity += 1;
+    }
+
+    public void     removeUnit() {
+        if (this._quantity > 1)
+            this._quantity -= 1;
+    }
 
     public String   getCode() { return this._code; }
     public String   getName() { return this._name; }
     public String   getDesc() { return this._desc; }
     public Double   getPrice() { return this._price; }
     public Integer  getQuantity() { return this._quantity; }
+
+    //    public void     setProductId(String productId) { this._productId = productId; }
+    //    public void     setShoppingCart(String shoppingCart) { this._shoppingCart = shoppingCart; }
+    //    public void     setCreatedAt(String createdAt) {}
+    //    public void     setUpdatedAt(String updatedAt) {}
+
 }
