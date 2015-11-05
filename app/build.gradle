@@ -46,4 +46,5 @@ dependencies {
     compile 'com.android.support:cardview-v7:22.2.1'
     compile 'com.google.api-client:google-api-client:1.18.0-rc'
     compile 'com.android.support:design:22.2.1'
+    compile project(':volley')
 }
