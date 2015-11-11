@@ -211,6 +211,7 @@
     <string name="no_data">Une erreur est survenue : Les informations sur ce produit sont corrompu.</string>
     <string name="error_serveur_return_payement">Une erreur est survenue : Nous n\'avons pas reçu la réponse du serveur Komyla.</string>
     <string name="error_camera_txt">Aucune appareil photo n\'a été détécté sur votre téléphone : Le scanner est inutilisable.</string>
+    <string name="unknow_error">Une erreur inattendue s\'est produite lors de l\'authentification.</string>
     <string name="error_server_ok_but_fail">Le serveur d\'authentification Komyla est joignable mais la création de votre compte a échoué. Veuillez réessayer ultérieurement. </string>
     <string name="error_server_ok_but_fail_login">Le serveur d\'authentification Komyla est joignable mais la connexion a échouée. Veuillez réessayer ultérieurement. </string>
     <string name="wrongRIB">L\'iban que vous nous avez indiqué ne semble pas valide. Vérifiez votre saisie et réessayer.\n\nSi le problème persiste, contactez notre support.</string>
@@ -232,12 +233,14 @@
     <string name="code003">Description : Le serveur n\'a pas reçu le nom. Code d\'erreur Komyla : 003. Code HTTP : 400</string>
     <string name="code004">Description : Le serveur n\'a pas reçu l\'email. Code d\'erreur Komyla : 004. Code HTTP : 400</string>
     <string name="code005">Description : Le serveur n\'a pas reçu le mot de passe. Code d\'erreur Komyla : 005. Code HTTP : 400</string>
-    <string name="code008">Description : Le serveur n\'a pas reçu le numéro de téléphone. Code d\'erreur Komyla : 008. Code HTTP : 400</string>
     <string name="code006">Description : Erreur interne au serveur, veuillez réessayer. Code d\'erreur Komyla : 006. Code HTTP : 500</string>
     <string name="code007">Vous ne pouvez pas créer de compte Komyla sans carte SIM. Insérez une carte SIM valide et réessayer. Code d\'erreur Komyla : 007</string>
+    <string name="code008">Description : Le serveur n\'a pas reçu le numéro de téléphone. Code d\'erreur Komyla : 008. Code HTTP : 400</string>
+    <string name="code009">Authentification impossible. Token introuvable. Code d\'erreur Komyla : 009</string>
     <string name="code051">Code d\'erreur Komyla : 051. Code HTTP : 403</string>
     <string name="code052">Description : Aucun compte n\'existe avec cette adresse email. Code d\'erreur Komyla : 052. Code HTTP : 400</string>
     <string name="code053">Description : Le mot de passe de ce compte est erroné. Code d\'erreur Komyla : 053. Code HTTP : 400</string>
+    <string name="code054">Description : Échec de l\'authentification. Email ou mot de passe invalide. Code d\'erreur Komyla : 054. Code HTTP : 400</string>
     <string name="code056">Description : Erreur interne au serveur, veuillez réessayer. Code d\'erreur Komyla : 056. Code HTTP : 500</string>
     <string name="error_403_token_expire">Erreur : La session a expiré. </string>
     <string name="error_403_passwordChange"> Votre mot de passe n\'a pas été modifié.</string>

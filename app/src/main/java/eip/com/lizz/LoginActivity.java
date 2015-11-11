@@ -8,7 +8,9 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -28,23 +30,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import org.apache.http.cookie.Cookie;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import eip.com.lizz.Network.Network;
 import eip.com.lizz.QueriesAPI.GetCsrfFromAPI;
 import eip.com.lizz.QueriesAPI.LogUserToAPI;
 import eip.com.lizz.Utils.UAlertBox;
 import eip.com.lizz.Utils.UApi;
 
 public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
-
-    private LogUserToAPI mAuthTask2 = null;
-    private GetCsrfFromAPI mAuthTask = null;
 
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -75,8 +78,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAuthTask = null;
-                mAuthTask2 = null;
                 if (UApi.isOnline(LoginActivity.this))
                     attemptLogin();
                 else
@@ -97,10 +98,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         mEmailView.setError(null);
         mPasswordView.setError(null);
 
@@ -133,33 +130,97 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
             showProgress(true);
-            mAuthTask = new GetCsrfFromAPI(LoginActivity.this);
-            mAuthTask.setOnTaskFinishedEvent(new GetCsrfFromAPI.OnTaskExecutionFinished() {
-                @Override
-                public void OnTaskFihishedEvent(String tokenCSFR, List<Cookie> cookies) {
-                    if (tokenCSFR.equals("000x000"))
-                    {
-                        showProgress(false);
-                        UAlertBox.alertOk(LoginActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
-                    }
-                    else {
-                        mAuthTask2 = new LogUserToAPI(mEmailView.getText().toString(), mPasswordView.getText().toString(), tokenCSFR, LoginActivity.this, cookies);
-                        mAuthTask2.setOnTaskFinishedEvent(new LogUserToAPI.OnTaskExecutionFinished() {
-                            @Override
-                            public void OnTaskFihishedEvent(JSONObject jObj) {
 
-                                showProgress(false);
-                                LogUserToAPI.checkErrorsAndLaunch(jObj, LoginActivity.this, getBaseContext());
+            String url = this.getResources().getString(R.string.url_api_komyla_no_suffix)
+                    + this.getResources().getString(R.string.url_api_csrfToken);
+
+            JsonObjectRequest getCSRF = new JsonObjectRequest
+                    (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                String token_csrf = response.get("_csrf").toString();
+                                SharedPreferences sharedpreferences = LoginActivity.this.getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
+                                sharedpreferences.edit().putString("eip.com.lizz._csrf", token_csrf).apply();
+
+                                String url_api = LoginActivity.this.getResources().getString(R.string.url_api_komyla_no_suffix)
+                                        + LoginActivity.this.getResources().getString(R.string.url_api_suffix)
+                                        + LoginActivity.this.getResources().getString(R.string.url_api_createSession);
+
+                                JSONObject data = new JSONObject();
+                                data.put("_csrf", token_csrf);
+                                data.put("email", mEmailView.getText().toString());
+                                data.put("password", mPasswordView.getText().toString());
+
+                                JsonObjectRequest logUser = new JsonObjectRequest(Request.Method.POST, url_api, data, new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        showProgress(false);
+                                        try {
+                                            SharedPreferences sharedpreferences = getBaseContext().getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
+                                            sharedpreferences.edit().putString("eip.com.lizz.firstname", response.getString("firstname")).apply();
+                                            sharedpreferences.edit().putString("eip.com.lizz.surname", response.getString("surname")).apply();
+                                            sharedpreferences.edit().putString("eip.com.lizz.email", response.getString("email")).apply();
+                                            sharedpreferences.edit().putString("eip.com.lizz.id_user", response.getString("id")).apply();
+                                            sharedpreferences.edit().putString("eip.com.lizz.phone", "0;").apply();
+                                            sharedpreferences.edit().putBoolean("eip.com.lizz.isLogged", true).apply();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        LoginActivity.this.finish();
+
+                                        Intent loggedUser = new Intent(getBaseContext(), MainMenuActivity.class);
+                                        loggedUser.putExtra("isLoginJustNow", true);
+                                        loggedUser.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        getBaseContext().startActivity(loggedUser);
+                                    }
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        showProgress(false);
+
+                                        int statusCode = error.networkResponse.statusCode;
+                                        switch (statusCode) {
+                                            case 403: {
+                                                UAlertBox.alertOk(LoginActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                        getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
+                                                                + getBaseContext().getResources().getString(R.string.code051));
+                                                break;
+                                            }
+                                            case 400: {
+                                                UAlertBox.alertOk(LoginActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                        getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
+                                                                + getBaseContext().getResources().getString(R.string.code054));
+                                                break;
+                                            }
+                                            case 500: {
+                                                UAlertBox.alertOk(LoginActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                        getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
+                                                                + getBaseContext().getResources().getString(R.string.code056));
+                                                break;
+                                            }
+                                            default:
+                                                UAlertBox.alertOk(LoginActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                        getBaseContext().getResources().getString(R.string.unknow_error));
+                                        }
+                                    }
+                                });
+                                Network.getInstance(LoginActivity.this).addToRequestQueue(logUser);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                UAlertBox.alertOk(LoginActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
                             }
+                        }
+                    }, new Response.ErrorListener() {
 
-                        });
-                        mAuthTask2.execute();
-                    }
-                }
-
-            });
-            mAuthTask.execute();
-
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            showProgress(false);
+                            UAlertBox.alertOk(LoginActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
+                        }
+                    });
+            Network.getInstance(this).addToRequestQueue(getCSRF);
         }
     }
 
