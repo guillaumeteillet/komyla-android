@@ -42,8 +42,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eip.com.lizz.Network.Network;
-import eip.com.lizz.QueriesAPI.GetCsrfFromAPI;
-import eip.com.lizz.QueriesAPI.LogUserToAPI;
 import eip.com.lizz.Utils.UAlertBox;
 import eip.com.lizz.Utils.UApi;
 

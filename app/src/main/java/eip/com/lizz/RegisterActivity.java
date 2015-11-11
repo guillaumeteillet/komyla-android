@@ -10,7 +10,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -33,6 +35,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+
 import org.apache.http.cookie.Cookie;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,6 +47,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import eip.com.lizz.Network.Network;
 import eip.com.lizz.QueriesAPI.AddUserToAPI;
 import eip.com.lizz.QueriesAPI.GetCsrfFromAPI;
 import eip.com.lizz.QueriesAPI.LogUserToAPI;
@@ -47,11 +55,8 @@ import eip.com.lizz.Utils.UAlertBox;
 import eip.com.lizz.Utils.UApi;
 import eip.com.lizz.Utils.USaveParams;
 
-public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor>{
+public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor> {
 
-    private GetCsrfFromAPI mAuthTask = null;
-    private AddUserToAPI mAuthTask2 = null;
-    private LogUserToAPI mAuthTask3 = null;
     private AutoCompleteTextView mEmailView;
     private EditText mSurnameView;
     private EditText mFirstnameView;
@@ -69,10 +74,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
-        mAuthTask = null;
-        mAuthTask2 = null;
-
-        TelephonyManager tMgr = (TelephonyManager)getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager tMgr = (TelephonyManager) getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
         //phoneNumber = tMgr.getLine1Number();
         mFirstnameView = (EditText) findViewById(R.id.firstname);
         mSurnameView = (EditText) findViewById(R.id.name);
@@ -99,8 +101,6 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mAuthTask = null;
-                mAuthTask2 = null;
                 if (UApi.isOnline(RegisterActivity.this))
                     attemptLogin();
                 else
@@ -121,10 +121,6 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
     }
 
     public void attemptLogin() {
-        if (mAuthTask != null) {
-            return;
-        }
-
         mFirstnameView.setError(null);
         mSurnameView.setError(null);
         mEmailView.setError(null);
@@ -150,15 +146,11 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             mFirstnameView.setError(getString(R.string.error_field_required));
             focusView = mFirstnameView;
             cancel = true;
-        }
-
-        else if (TextUtils.isEmpty(surname)) {
+        } else if (TextUtils.isEmpty(surname)) {
             mSurnameView.setError(getString(R.string.error_field_required));
             focusView = mSurnameView;
             cancel = true;
-        }
-
-        else if (TextUtils.isEmpty(email)) {
+        } else if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
@@ -166,14 +158,11 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
-        }
-
-        else if (TextUtils.isEmpty(password)) {
+        } else if (TextUtils.isEmpty(password)) {
             mPasswordView.setError(getString(R.string.error_field_required));
             focusView = mPasswordView;
             cancel = true;
-        }
-        else if (isPasswordNotValidPolitic(password)) {
+        } else if (isPasswordNotValidPolitic(password)) {
             mPasswordView.setError(getString(R.string.error_password_politic));
             focusView = mPasswordView;
             cancel = true;
@@ -191,98 +180,172 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
 
 
                     if (mdpConfirm.getText().toString().equals(mPasswordView.getText().toString())) {
-                        InputMethodManager imm = (InputMethodManager)getSystemService(
+                        InputMethodManager imm = (InputMethodManager) getSystemService(
                                 Context.INPUT_METHOD_SERVICE);
                         imm.hideSoftInputFromWindow(mdpConfirm.getWindowToken(), 0);
-            View view = getCurrentFocus();
-            if (view != null) {
-                imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
-            showProgress(true);
+                        View view = getCurrentFocus();
+                        if (view != null) {
+                            imm.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                        }
+                        showProgress(true);
 
-            mAuthTask = new GetCsrfFromAPI(RegisterActivity.this);
-            mAuthTask.setOnTaskFinishedEvent(new GetCsrfFromAPI.OnTaskExecutionFinished()
-            {
-                @Override
-                public void OnTaskFihishedEvent(final String tokenCSFR, final List<Cookie> cookies)
-                {
-                    if (tokenCSFR.equals("000x000"))
-                    {
-                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
-                    }
-                    else
-                    {
-                        mAuthTask2 = new AddUserToAPI(firstname, surname, email, phoneNumber, password, tokenCSFR, RegisterActivity.this, cookies);
-                        mAuthTask2.setOnTaskFinishedEvent(new AddUserToAPI.OnTaskExecutionFinished() {
-                            @Override
-                            public void OnTaskFihishedEvent(JSONObject jObj) {
-                                showProgress(false);
-                                try {
-                                    if (jObj.get("responseCode").toString().equals("200"))
-                                    {
-                                        finish();
-                                        mAuthTask3 = new LogUserToAPI(mEmailView.getText().toString(), mPasswordView.getText().toString(), tokenCSFR, RegisterActivity.this, cookies);
-                                        mAuthTask3.setOnTaskFinishedEvent(new LogUserToAPI.OnTaskExecutionFinished() {
-                                            @Override
-                                            public void OnTaskFihishedEvent(JSONObject jObj) {
+                        String url = getBaseContext().getResources().getString(R.string.url_api_komyla_no_suffix)
+                                + getBaseContext().getResources().getString(R.string.url_api_csrfToken);
 
-                                                showProgress(false);
-                                                LogUserToAPI.checkErrorsAndLaunch(jObj, RegisterActivity.this, getBaseContext());
-                                            }
-                                        });
-                                        mAuthTask3.execute();
+                        JsonObjectRequest getCSRF = new JsonObjectRequest
+                                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                                    @Override
+                                    public void onResponse(JSONObject response) {
+                                        String token_csrf = "";
+                                        try {
+                                            token_csrf = response.get("_csrf").toString();
+                                        } catch (JSONException e) {
+                                            UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
+                                            e.printStackTrace();
+                                        }
+                                        final String crsf = token_csrf;
+
+                                        SharedPreferences sharedpreferences = RegisterActivity.this.getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
+                                        sharedpreferences.edit().putString("eip.com.lizz._csrf", token_csrf).apply();
+
+                                        String url_api = getBaseContext().getResources().getString(R.string.url_api_komyla_no_suffix)
+                                                + getBaseContext().getResources().getString(R.string.url_api_suffix)
+                                                + getBaseContext().getResources().getString(R.string.url_api_createUser);
+                                        JSONObject data = new JSONObject();
+                                        try {
+                                            data.put("_csrf", token_csrf);
+                                            data.put("firstname", firstname);
+                                            data.put("surname", surname);
+                                            data.put("email", email);
+                                            data.put("phoneNumber", phoneNumber);
+                                            data.put("password", password);
+                                            data.put("passwordConfirmation", password);
+
+                                            JsonObjectRequest addUser = new JsonObjectRequest(Request.Method.POST, url_api, data, new Response.Listener<JSONObject>() {
+                                                @Override
+                                                public void onResponse(JSONObject response) {
+                                                    finish();
+                                                    try {
+                                                        String url_api = RegisterActivity.this.getResources().getString(R.string.url_api_komyla_no_suffix)
+                                                                + RegisterActivity.this.getResources().getString(R.string.url_api_suffix)
+                                                                + RegisterActivity.this.getResources().getString(R.string.url_api_createSession);
+
+                                                        JSONObject data = new JSONObject();
+                                                        data.put("_csrf", crsf);
+                                                        data.put("email", mEmailView.getText().toString());
+                                                        data.put("password", mPasswordView.getText().toString());
+
+                                                        JsonObjectRequest logUser = new JsonObjectRequest(Request.Method.POST, url_api, data, new Response.Listener<JSONObject>() {
+                                                            @Override
+                                                            public void onResponse(JSONObject response) {
+                                                                showProgress(false);
+                                                                try {
+                                                                    SharedPreferences sharedpreferences = getBaseContext().getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
+                                                                    sharedpreferences.edit().putString("eip.com.lizz.firstname", response.getString("firstname")).apply();
+                                                                    sharedpreferences.edit().putString("eip.com.lizz.surname", response.getString("surname")).apply();
+                                                                    sharedpreferences.edit().putString("eip.com.lizz.email", response.getString("email")).apply();
+                                                                    sharedpreferences.edit().putString("eip.com.lizz.id_user", response.getString("id")).apply();
+                                                                    sharedpreferences.edit().putString("eip.com.lizz.phone", "0;").apply();
+                                                                    sharedpreferences.edit().putBoolean("eip.com.lizz.isLogged", true).apply();
+                                                                } catch (JSONException e) {
+                                                                    e.printStackTrace();
+                                                                }
+                                                                RegisterActivity.this.finish();
+
+                                                                Intent loggedUser = new Intent(getBaseContext(), MainMenuActivity.class);
+                                                                loggedUser.putExtra("isLoginJustNow", true);
+                                                                loggedUser.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                                getBaseContext().startActivity(loggedUser);
+                                                            }
+                                                        }, new Response.ErrorListener() {
+                                                            @Override
+                                                            public void onErrorResponse(VolleyError error) {
+                                                                showProgress(false);
+
+                                                                int statusCode = error.networkResponse.statusCode;
+                                                                switch (statusCode) {
+                                                                    case 403: {
+                                                                        UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                                                getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
+                                                                                        + getBaseContext().getResources().getString(R.string.code051));
+                                                                        break;
+                                                                    }
+                                                                    case 400: {
+                                                                        UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                                                getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
+                                                                                        + getBaseContext().getResources().getString(R.string.code054));
+                                                                        break;
+                                                                    }
+                                                                    case 500: {
+                                                                        UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                                                getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
+                                                                                        + getBaseContext().getResources().getString(R.string.code056));
+                                                                        break;
+                                                                    }
+                                                                    default:
+                                                                        UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                                                getBaseContext().getResources().getString(R.string.unknow_error));
+                                                                }
+                                                            }
+                                                        });
+                                                        Network.getInstance(RegisterActivity.this).addToRequestQueue(logUser);
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
+                                                    }
+
+                                                }
+                                            }, new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    showProgress(false);
+                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code006));
+
+                                                    /*
+                                                    else if (jObj.get("responseCode").toString().equals("400")) {
+                                                    JSONObject array = jObj.getJSONObject("invalidAttributes");
+                                                    boolean firstnameIsMissing = array.has("firstname");
+                                                    boolean surnameIsMissing = array.has("surname");
+                                                    boolean emailIsMissing = array.has("email");
+                                                    boolean passwordIsMissing = array.has("password");
+                                                    boolean phone = array.has("phoneNumber");
+                                                    if (firstnameIsMissing)
+                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code002));
+                                                    else if (surnameIsMissing)
+                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code003));
+                                                    else if (emailIsMissing)
+                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code004));
+                                                    else if (passwordIsMissing)
+                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code005));
+                                                    else if (phone)
+                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code008));
+                                                } else if (jObj.get("responseCode").toString().equals("403")) {
+                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code001));
+                                                } else if (jObj.get("responseCode").toString().equals("408")) {
+                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
+                                                } else if (jObj.get("responseCode").toString().equals("500")) {
+                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code006));
+                                                } else {
+                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code006));
+                                                }
+                                                     */
+                                                }
+                                            });
+                                            Network.getInstance(RegisterActivity.this).addToRequestQueue(addUser);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
                                     }
-                                    else if (jObj.get("responseCode").toString().equals("400"))
-                                    {
-                                        JSONObject array = jObj.getJSONObject("invalidAttributes");
-                                        boolean firstnameIsMissing = array.has("firstname");
-                                        boolean surnameIsMissing = array.has("surname");
-                                        boolean emailIsMissing = array.has("email");
-                                        boolean passwordIsMissing = array.has("password");
-                                        boolean phone = array.has("phoneNumber");
-                                        if (firstnameIsMissing)
-                                            UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code002));
-                                        else if (surnameIsMissing)
-                                            UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code003));
-                                        else if (emailIsMissing)
-                                            UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code004));
-                                        else if (passwordIsMissing)
-                                            UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code005));
-                                        else if (phone)
-                                            UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code008));
-                                    }
-                                    else if(jObj.get("responseCode").toString().equals("403"))
-                                    {
-                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code001));
-                                    }
-                                    else if(jObj.get("responseCode").toString().equals("408"))
-                                    {
+                                }, new Response.ErrorListener() {
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        showProgress(false);
                                         UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
                                     }
-                                    else if (jObj.get("responseCode").toString().equals("500"))
-                                    {
-                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code006));
-                                    }
-                                    else
-                                    {
-                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code006));
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-
-                        });
-                        mAuthTask2.execute();
-                    }
-                }
-
-            });
-            mAuthTask.execute();
-
-                    }
-                    else
-                    {
+                                });
+                        Network.getInstance(RegisterActivity.this).addToRequestQueue(getCSRF);
+                    } else {
                         USaveParams.displayError(5, RegisterActivity.this, null, null, false);
                         mdpConfirm.setText("");
                     }
@@ -316,16 +379,13 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
         char[] stringArray;
         int i = 0;
         stringArray = password.toCharArray();
-        while (i < stringArray.length)
-        {
-            if (letters == false)
-            {
-                if(Character.isLetter(stringArray[i]))
+        while (i < stringArray.length) {
+            if (letters == false) {
+                if (Character.isLetter(stringArray[i]))
                     letters = true;
             }
-            if (numbers == false)
-            {
-                if(Character.isDigit(stringArray[i]))
+            if (numbers == false) {
+                if (Character.isDigit(stringArray[i]))
                     numbers = true;
             }
             i++;
@@ -372,7 +432,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
                         ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
                 ContactsContract.Contacts.Data.MIMETYPE +
                         " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                                                                     .CONTENT_ITEM_TYPE},
+                .CONTENT_ITEM_TYPE},
 
                 ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
     }
@@ -423,10 +483,10 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             return emailAddressCollection;
         }
 
-	    @Override
-	    protected void onPostExecute(List<String> emailAddressCollection) {
-	       addEmailsToAutoComplete(emailAddressCollection);
-	    }
+        @Override
+        protected void onPostExecute(List<String> emailAddressCollection) {
+            addEmailsToAutoComplete(emailAddressCollection);
+        }
     }
 
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
