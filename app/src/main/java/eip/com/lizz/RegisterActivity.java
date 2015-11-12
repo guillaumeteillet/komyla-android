@@ -372,7 +372,6 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
 
     public static boolean isPasswordNotValidPolitic(String password) {
 
-
         boolean letters = false;
         boolean numbers = false;
 

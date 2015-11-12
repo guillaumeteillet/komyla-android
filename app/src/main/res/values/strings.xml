@@ -237,6 +237,7 @@
     <string name="code007">Vous ne pouvez pas créer de compte Komyla sans carte SIM. Insérez une carte SIM valide et réessayer. Code d\'erreur Komyla : 007</string>
     <string name="code008">Description : Le serveur n\'a pas reçu le numéro de téléphone. Code d\'erreur Komyla : 008. Code HTTP : 400</string>
     <string name="code009">Authentification impossible. Token introuvable. Code d\'erreur Komyla : 009</string>
+    <string name="code010">Échec de l\s'authentification! Réponse du serveur invalide. Code d\'erreur Komyla : 010.</string>
     <string name="code051">Code d\'erreur Komyla : 051. Code HTTP : 403</string>
     <string name="code052">Description : Aucun compte n\'existe avec cette adresse email. Code d\'erreur Komyla : 052. Code HTTP : 400</string>
     <string name="code053">Description : Le mot de passe de ce compte est erroné. Code d\'erreur Komyla : 053. Code HTTP : 400</string>

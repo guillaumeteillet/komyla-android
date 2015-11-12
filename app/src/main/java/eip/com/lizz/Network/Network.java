@@ -37,18 +37,6 @@ public class Network {
     {
         if (mRequestQueue == null)
         {
-            /*
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-
-            CookieStore cookieStore = new BasicCookieStore();
-            HttpContext httpContext = new BasicHttpContext();
-
-            httpContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-            httpClient.setCookieStore(cookieStore);
-
-             Volley.newRequestQueue(mContext.getApplicationContext(), new HttpClientStack(httpClient));
-            */
-
             CookieManager cookieManage = new CookieManager();
             CookieHandler.setDefault(cookieManage);
             mRequestQueue = Volley.newRequestQueue(mContext.getApplicationContext());

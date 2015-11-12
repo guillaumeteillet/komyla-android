@@ -41,7 +41,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import eip.com.lizz.Network.GET_CSRF;
 import eip.com.lizz.Network.Network;
+import eip.com.lizz.Network.POST_LogUser;
 import eip.com.lizz.Utils.UAlertBox;
 import eip.com.lizz.Utils.UApi;
 
@@ -129,7 +131,48 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             }
             showProgress(true);
 
-            String url = this.getResources().getString(R.string.url_api_komyla_no_suffix)
+
+            new GET_CSRF(this, getBaseContext(), new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+
+                    try {
+                        String token_csrf = response.get("_csrf").toString();
+
+                        JSONObject data = new JSONObject();
+                        data.put("_csrf", token_csrf);
+                        data.put("email", mEmailView.getText().toString());
+                        data.put("password", mPasswordView.getText().toString());
+
+                        new POST_LogUser(LoginActivity.this, getBaseContext(), new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                showProgress(false);
+                                LoginActivity.this.finish();
+                                Intent loggedUser = new Intent(getBaseContext(), MainMenuActivity.class);
+                                loggedUser.putExtra("isLoginJustNow", true);
+                                loggedUser.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                getBaseContext().startActivity(loggedUser);
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                showProgress(false);
+                            }
+                        }).run(data);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    showProgress(false);
+                }
+            }).run();
+
+
+            /*String url = this.getResources().getString(R.string.url_api_komyla_no_suffix)
                     + this.getResources().getString(R.string.url_api_csrfToken);
 
             JsonObjectRequest getCSRF = new JsonObjectRequest
@@ -219,6 +262,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         }
                     });
             Network.getInstance(this).addToRequestQueue(getCSRF);
+            */
         }
     }
 
