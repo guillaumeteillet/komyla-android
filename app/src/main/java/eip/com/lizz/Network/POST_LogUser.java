@@ -2,6 +2,7 @@ package eip.com.lizz.Network;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import com.android.volley.Request;
@@ -12,6 +13,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import eip.com.lizz.MainMenuActivity;
 import eip.com.lizz.R;
 import eip.com.lizz.Utils.UAlertBox;
 
@@ -42,8 +44,6 @@ public class POST_LogUser
         mRequest = new JsonObjectRequest(Request.Method.POST, URL, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                if (mResponse != null)
-                    mResponse.onResponse(response);
                 try
                 {
                     SharedPreferences sharedpreferences = mContext.getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
@@ -53,6 +53,15 @@ public class POST_LogUser
                     sharedpreferences.edit().putString("eip.com.lizz.id_user", response.getString("id")).apply();
                     sharedpreferences.edit().putString("eip.com.lizz.phone", "0;").apply();
                     sharedpreferences.edit().putBoolean("eip.com.lizz.isLogged", true).apply();
+
+                    mActivity.finish();
+                    Intent loggedUser = new Intent(mContext, MainMenuActivity.class);
+                    loggedUser.putExtra("isLoginJustNow", true);
+                    loggedUser.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(loggedUser);
+
+                    if (mResponse != null)
+                        mResponse.onResponse(response);
                 }
                 catch (JSONException e) {
                     e.printStackTrace();
@@ -62,9 +71,6 @@ public class POST_LogUser
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                if (mError != null)
-                    mError.onErrorResponse(error);
-
                 int statusCode = error.networkResponse.statusCode;
                 switch (statusCode) {
                     case 403: {
@@ -89,6 +95,8 @@ public class POST_LogUser
                         UAlertBox.alertOk(mActivity, mContext.getResources().getString(R.string.error),
                                 mContext.getResources().getString(R.string.unknow_error));
                 }
+                if (mError != null)
+                    mError.onErrorResponse(error);
             }
         });
     }

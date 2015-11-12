@@ -143,11 +143,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             @Override
                             public void onResponse(JSONObject response) {
                                 showProgress(false);
-                                LoginActivity.this.finish();
-                                Intent loggedUser = new Intent(getBaseContext(), MainMenuActivity.class);
-                                loggedUser.putExtra("isLoginJustNow", true);
-                                loggedUser.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                getBaseContext().startActivity(loggedUser);
                             }
                         }, new Response.ErrorListener() {
                             @Override

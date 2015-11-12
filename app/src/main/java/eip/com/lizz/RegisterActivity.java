@@ -10,9 +10,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -23,7 +21,6 @@ import android.provider.ContactsContract;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,19 +32,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.apache.http.cookie.Cookie;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eip.com.lizz.Network.Network;
+import eip.com.lizz.Network.GET_CSRF;
+import eip.com.lizz.Network.POST_AddUser;
+import eip.com.lizz.Network.POST_LogUser;
 import eip.com.lizz.QueriesAPI.AddUserToAPI;
 import eip.com.lizz.QueriesAPI.GetCsrfFromAPI;
 import eip.com.lizz.QueriesAPI.LogUserToAPI;
@@ -178,7 +174,6 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
             alert.setPositiveButton(getResources().getString(R.string.dialog_ok), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
 
-
                     if (mdpConfirm.getText().toString().equals(mPasswordView.getText().toString())) {
                         InputMethodManager imm = (InputMethodManager) getSystemService(
                                 Context.INPUT_METHOD_SERVICE);
@@ -189,162 +184,66 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
                         }
                         showProgress(true);
 
-                        String url = getBaseContext().getResources().getString(R.string.url_api_komyla_no_suffix)
-                                + getBaseContext().getResources().getString(R.string.url_api_csrfToken);
+                        new GET_CSRF(RegisterActivity.this, getBaseContext(), new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    final String token_csrf = response.get("_csrf").toString();
+                                    JSONObject data = new JSONObject();
+                                    data.put("_csrf", token_csrf);
+                                    data.put("firstname", firstname);
+                                    data.put("surname", surname);
+                                    data.put("email", email);
+                                    data.put("phoneNumber", phoneNumber);
+                                    data.put("password", password);
+                                    data.put("passwordConfirmation", password);
 
-                        JsonObjectRequest getCSRF = new JsonObjectRequest
-                                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                                    @Override
-                                    public void onResponse(JSONObject response) {
-                                        String token_csrf = "";
-                                        try {
-                                            token_csrf = response.get("_csrf").toString();
-                                        } catch (JSONException e) {
-                                            UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
-                                            e.printStackTrace();
-                                        }
-                                        final String crsf = token_csrf;
+                                    new POST_AddUser(RegisterActivity.this, getBaseContext(), new Response.Listener<JSONObject>() {
+                                        @Override
+                                        public void onResponse(JSONObject response) {
+                                            finish();
+                                            try {
+                                                JSONObject data = new JSONObject();
+                                                data.put("_csrf", token_csrf);
+                                                data.put("email", mEmailView.getText().toString());
+                                                data.put("password", mPasswordView.getText().toString());
 
-                                        SharedPreferences sharedpreferences = RegisterActivity.this.getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
-                                        sharedpreferences.edit().putString("eip.com.lizz._csrf", token_csrf).apply();
-
-                                        String url_api = getBaseContext().getResources().getString(R.string.url_api_komyla_no_suffix)
-                                                + getBaseContext().getResources().getString(R.string.url_api_suffix)
-                                                + getBaseContext().getResources().getString(R.string.url_api_createUser);
-                                        JSONObject data = new JSONObject();
-                                        try {
-                                            data.put("_csrf", token_csrf);
-                                            data.put("firstname", firstname);
-                                            data.put("surname", surname);
-                                            data.put("email", email);
-                                            data.put("phoneNumber", phoneNumber);
-                                            data.put("password", password);
-                                            data.put("passwordConfirmation", password);
-
-                                            JsonObjectRequest addUser = new JsonObjectRequest(Request.Method.POST, url_api, data, new Response.Listener<JSONObject>() {
-                                                @Override
-                                                public void onResponse(JSONObject response) {
-                                                    finish();
-                                                    try {
-                                                        String url_api = RegisterActivity.this.getResources().getString(R.string.url_api_komyla_no_suffix)
-                                                                + RegisterActivity.this.getResources().getString(R.string.url_api_suffix)
-                                                                + RegisterActivity.this.getResources().getString(R.string.url_api_createSession);
-
-                                                        JSONObject data = new JSONObject();
-                                                        data.put("_csrf", crsf);
-                                                        data.put("email", mEmailView.getText().toString());
-                                                        data.put("password", mPasswordView.getText().toString());
-
-                                                        JsonObjectRequest logUser = new JsonObjectRequest(Request.Method.POST, url_api, data, new Response.Listener<JSONObject>() {
-                                                            @Override
-                                                            public void onResponse(JSONObject response) {
-                                                                showProgress(false);
-                                                                try {
-                                                                    SharedPreferences sharedpreferences = getBaseContext().getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
-                                                                    sharedpreferences.edit().putString("eip.com.lizz.firstname", response.getString("firstname")).apply();
-                                                                    sharedpreferences.edit().putString("eip.com.lizz.surname", response.getString("surname")).apply();
-                                                                    sharedpreferences.edit().putString("eip.com.lizz.email", response.getString("email")).apply();
-                                                                    sharedpreferences.edit().putString("eip.com.lizz.id_user", response.getString("id")).apply();
-                                                                    sharedpreferences.edit().putString("eip.com.lizz.phone", "0;").apply();
-                                                                    sharedpreferences.edit().putBoolean("eip.com.lizz.isLogged", true).apply();
-                                                                } catch (JSONException e) {
-                                                                    e.printStackTrace();
-                                                                }
-                                                                RegisterActivity.this.finish();
-
-                                                                Intent loggedUser = new Intent(getBaseContext(), MainMenuActivity.class);
-                                                                loggedUser.putExtra("isLoginJustNow", true);
-                                                                loggedUser.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                                getBaseContext().startActivity(loggedUser);
-                                                            }
-                                                        }, new Response.ErrorListener() {
-                                                            @Override
-                                                            public void onErrorResponse(VolleyError error) {
-                                                                showProgress(false);
-
-                                                                int statusCode = error.networkResponse.statusCode;
-                                                                switch (statusCode) {
-                                                                    case 403: {
-                                                                        UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
-                                                                                getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
-                                                                                        + getBaseContext().getResources().getString(R.string.code051));
-                                                                        break;
-                                                                    }
-                                                                    case 400: {
-                                                                        UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
-                                                                                getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
-                                                                                        + getBaseContext().getResources().getString(R.string.code054));
-                                                                        break;
-                                                                    }
-                                                                    case 500: {
-                                                                        UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
-                                                                                getBaseContext().getResources().getString(R.string.error_server_ok_but_fail_login)
-                                                                                        + getBaseContext().getResources().getString(R.string.code056));
-                                                                        break;
-                                                                    }
-                                                                    default:
-                                                                        UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
-                                                                                getBaseContext().getResources().getString(R.string.unknow_error));
-                                                                }
-                                                            }
-                                                        });
-                                                        Network.getInstance(RegisterActivity.this).addToRequestQueue(logUser);
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
-                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
+                                                new POST_LogUser(RegisterActivity.this, getBaseContext(), new Response.Listener<JSONObject>() {
+                                                    @Override
+                                                    public void onResponse(JSONObject response) {
+                                                        showProgress(false);
                                                     }
+                                                }, new Response.ErrorListener() {
+                                                    @Override
+                                                    public void onErrorResponse(VolleyError error) {
+                                                        showProgress(false);
+                                                    }
+                                                }).run(data);
 
-                                                }
-                                            }, new Response.ErrorListener() {
-                                                @Override
-                                                public void onErrorResponse(VolleyError error) {
-                                                    showProgress(false);
-                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code006));
-
-                                                    /*
-                                                    else if (jObj.get("responseCode").toString().equals("400")) {
-                                                    JSONObject array = jObj.getJSONObject("invalidAttributes");
-                                                    boolean firstnameIsMissing = array.has("firstname");
-                                                    boolean surnameIsMissing = array.has("surname");
-                                                    boolean emailIsMissing = array.has("email");
-                                                    boolean passwordIsMissing = array.has("password");
-                                                    boolean phone = array.has("phoneNumber");
-                                                    if (firstnameIsMissing)
-                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code002));
-                                                    else if (surnameIsMissing)
-                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code003));
-                                                    else if (emailIsMissing)
-                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code004));
-                                                    else if (passwordIsMissing)
-                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code005));
-                                                    else if (phone)
-                                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code008));
-                                                } else if (jObj.get("responseCode").toString().equals("403")) {
-                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code001));
-                                                } else if (jObj.get("responseCode").toString().equals("408")) {
-                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
-                                                } else if (jObj.get("responseCode").toString().equals("500")) {
-                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code006));
-                                                } else {
-                                                    UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_server_ok_but_fail) + getResources().getString(R.string.code006));
-                                                }
-                                                     */
-                                                }
-                                            });
-                                            Network.getInstance(RegisterActivity.this).addToRequestQueue(addUser);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                                UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
+                                            }
                                         }
+                                    }, new Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            showProgress(false);
+                                        }
+                                    }).run(data);
 
-                                    }
-                                }, new Response.ErrorListener() {
-                                    @Override
-                                    public void onErrorResponse(VolleyError error) {
-                                        showProgress(false);
-                                        UAlertBox.alertOk(RegisterActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
-                                    }
-                                });
-                        Network.getInstance(RegisterActivity.this).addToRequestQueue(getCSRF);
+                                } catch (JSONException e) {
+                                    UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error), getBaseContext().getResources().getString(R.string.code010));
+                                    e.printStackTrace();
+                                }
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                showProgress(false);
+                            }
+                        }).run();
+
                     } else {
                         USaveParams.displayError(5, RegisterActivity.this, null, null, false);
                         mdpConfirm.setText("");
