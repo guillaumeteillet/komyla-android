@@ -29,6 +29,18 @@ public class POST_LogUser
     private Response.Listener<JSONObject>   mResponse   = null;
     private JsonObjectRequest               mRequest    = null;
 
+    public static void saveLocalParams(String firstname, String surname, String email, String id, String phone, final Context context)
+    {
+         // TODO : Récupérer les numéros de téléphone from l'API.
+        SharedPreferences sharedpreferences = context.getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
+        sharedpreferences.edit().putString("eip.com.lizz.firstname", firstname).apply();
+        sharedpreferences.edit().putString("eip.com.lizz.surname", surname).apply();
+        sharedpreferences.edit().putString("eip.com.lizz.email", email).apply();
+        sharedpreferences.edit().putString("eip.com.lizz.id_user", id).apply();
+        sharedpreferences.edit().putString("eip.com.lizz.phone", phone).apply();
+        sharedpreferences.edit().putBoolean("eip.com.lizz.isLogged", true).apply();
+    }
+
     public POST_LogUser(Activity activity, Context context, Response.Listener<JSONObject> response, Response.ErrorListener error)
     {
         mActivity = activity;
@@ -46,13 +58,11 @@ public class POST_LogUser
             public void onResponse(JSONObject response) {
                 try
                 {
-                    SharedPreferences sharedpreferences = mContext.getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
-                    sharedpreferences.edit().putString("eip.com.lizz.firstname", response.getString("firstname")).apply();
-                    sharedpreferences.edit().putString("eip.com.lizz.surname", response.getString("surname")).apply();
-                    sharedpreferences.edit().putString("eip.com.lizz.email", response.getString("email")).apply();
-                    sharedpreferences.edit().putString("eip.com.lizz.id_user", response.getString("id")).apply();
-                    sharedpreferences.edit().putString("eip.com.lizz.phone", "0;").apply();
-                    sharedpreferences.edit().putBoolean("eip.com.lizz.isLogged", true).apply();
+                    POST_LogUser.saveLocalParams(response.getString("firstname"),
+                            response.getString("surname"),
+                            response.getString("email"),
+                            response.getString("id"),
+                            "0;", mContext);
 
                     mActivity.finish();
                     Intent loggedUser = new Intent(mContext, MainMenuActivity.class);

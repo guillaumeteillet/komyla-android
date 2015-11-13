@@ -1,13 +1,10 @@
 package eip.com.lizz;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -29,17 +26,15 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.cookie.Cookie;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
 
-import eip.com.lizz.QueriesAPI.GetCsrfFromAPI;
-import eip.com.lizz.QueriesAPI.LogUserToAPI;
+import eip.com.lizz.Network.GET_CSRF;
+import eip.com.lizz.Network.POST_LogUser;
 import eip.com.lizz.QueriesAPI.UserCreateSSOFb;
 import eip.com.lizz.QueriesAPI.UserCreateSSOGoogle;
 import eip.com.lizz.Utils.UAlertBox;
@@ -51,7 +46,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
     private String fbAccessToken;
     public String email;
-    private GetCsrfFromAPI mAuthTask = null;
     private UserCreateSSOFb mAuthTask2 = null;
     private UserCreateSSOGoogle mAuthTask3 = null;
     private static final String TAG = "ExampleActivity";
@@ -115,9 +109,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         if (!supportsGooglePlayServices()) {
             gplus.setVisibility(View.GONE);
             return;
-        }
-        else
-        {
+        } else {
             gplus.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     mSignInClicked = true;
@@ -196,7 +188,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     }
 
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -211,9 +202,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             if (!mGoogleApiClient.isConnecting()) {
                 mGoogleApiClient.connect();
             }
-        }
-        else
-        {
+        } else {
             Session session = Session.getActiveSession();
             session.onActivityResult(this, requestCode, resultCode, data);
             if (session.isOpened()) {
@@ -222,16 +211,13 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                 RequestAsyncTask requestAsyncTask = Request.executeMeRequestAsync(session, new Request.GraphUserCallback() {
                     @Override
                     public void onCompleted(GraphUser user, Response response) {
-                        mAuthTask = new GetCsrfFromAPI(HomeActivity.this);
-                        mAuthTask.setOnTaskFinishedEvent(new GetCsrfFromAPI.OnTaskExecutionFinished() {
+
+                        new GET_CSRF(HomeActivity.this, getBaseContext(), new com.android.volley.Response.Listener<JSONObject>() {
                             @Override
-                            public void OnTaskFihishedEvent(String tokenCSFR, List<Cookie> cookies) {
-                                if (tokenCSFR.equals("000x000"))
-                                {
-                                    UAlertBox.alertOk(HomeActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
-                                }
-                                else {
-                                    mAuthTask2 = new UserCreateSSOFb(tokenCSFR, getBaseContext(), fbAccessToken);
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    String tokenCSRF = response.get("_csrf").toString();
+                                    mAuthTask2 = new UserCreateSSOFb(tokenCSRF, getBaseContext(), fbAccessToken);
                                     mAuthTask2.setOnTaskFinishedEvent(new UserCreateSSOFb.OnTaskExecutionFinished() {
                                         @Override
                                         public void OnTaskFihishedEvent(HttpResponse httpResponse) {
@@ -239,23 +225,22 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                                         }
                                     });
                                     mAuthTask2.execute();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
                                 }
                             }
-
-                        });
-                        mAuthTask.execute();
+                        }, null).run();
                     }
                 });
             }
         }
     }
 
-    private void dataAPI(HttpResponse httpResponse, String sso)
-    {
+    private void dataAPI(HttpResponse httpResponse, String sso) {
         InputStream inputStream = null;
         try {
             inputStream = httpResponse.getEntity().getContent();
-            String jString =  UApi.convertStreamToString(inputStream);
+            String jString = UApi.convertStreamToString(inputStream);
             JSONObject jObj = new JSONObject(jString);
 
             int responseCode = httpResponse.getStatusLine().getStatusCode();
@@ -291,10 +276,9 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
     private void API_200(JSONObject jObj, String sso) throws JSONException {
 
-        LogUserToAPI.LogUserSaveLocalParams(jObj.getString("firstname"), jObj.getString("surname"), jObj.getString("email"), jObj.getString("id"), "0;", getBaseContext(), HomeActivity.this);
+        POST_LogUser.saveLocalParams(jObj.getString("firstname"), jObj.getString("surname"), jObj.getString("email"), jObj.getString("id"), "0;", getBaseContext());
 
-        if (sso.equals("fb"))
-        {
+        if (sso.equals("fb")) {
             Session session = Session.getActiveSession();
             if (session != null) {
                 session.closeAndClearTokenInformation();
@@ -307,19 +291,14 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         startActivity(loggedUser);
     }
 
-    private  void API_400(JSONObject jObj, String sso)
-    {
-        if (sso.equals("fb"))
-        {
-            if (jObj.has(getResources().getString(R.string.api_user_sso_fb_error)))
-            {
+    private void API_400(JSONObject jObj, String sso) {
+        if (sso.equals("fb")) {
+            if (jObj.has(getResources().getString(R.string.api_user_sso_fb_error))) {
                 try {
                     String error = jObj.get(getResources().getString(R.string.api_user_sso_fb_error)).toString();
-                    if (error.equals(getResources().getString(R.string.api_user_sso_fb_access_token_empty)))
-                    {
+                    if (error.equals(getResources().getString(R.string.api_user_sso_fb_access_token_empty))) {
                         UAlertBox.alertOk(HomeActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_400_sso_fb_token_empty));
-                    }
-                    else // L'access token est expiré.
+                    } else // L'access token est expiré.
                     {
                         UAlertBox.alertOk(HomeActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_400_sso_fb_token_expire));
                     }
@@ -331,18 +310,13 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             if (session != null) {
                 session.closeAndClearTokenInformation();
             }
-        }
-        else if (sso.equals("google"))
-        {
-            if (jObj.has(getResources().getString(R.string.api_user_sso_google_error)))
-            {
+        } else if (sso.equals("google")) {
+            if (jObj.has(getResources().getString(R.string.api_user_sso_google_error))) {
                 try {
                     String error = jObj.get(getResources().getString(R.string.api_user_sso_google_error)).toString();
-                    if (error.equals(getResources().getString(R.string.api_user_sso_google_access_token_empty)))
-                    {
+                    if (error.equals(getResources().getString(R.string.api_user_sso_google_access_token_empty))) {
                         UAlertBox.alertOk(HomeActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_400_sso_google_token_empty));
-                    }
-                    else // L'access token est expiré.
+                    } else // L'access token est expiré.
                     {
                         UAlertBox.alertOk(HomeActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_400_sso_google_token_expire));
                     }
@@ -353,8 +327,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-    private void API_403()
-    {
+    private void API_403() {
         Toast.makeText(getBaseContext(), getResources().getString(R.string.error_403_token_expire), Toast.LENGTH_LONG).show();
     }
 
@@ -369,16 +342,13 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
        /* */
 
-
         if (mGoogleApiClient.isConnected()) {
-            mAuthTask = new GetCsrfFromAPI(HomeActivity.this);
-            mAuthTask.setOnTaskFinishedEvent(new GetCsrfFromAPI.OnTaskExecutionFinished() {
+            new GET_CSRF(this, getBaseContext(), new com.android.volley.Response.Listener<JSONObject>() {
                 @Override
-                public void OnTaskFihishedEvent(String tokenCSFR, List<Cookie> cookies) {
-                    if (tokenCSFR.equals("000x000")) {
-                        UAlertBox.alertOk(HomeActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.code000));
-                    } else {
-                        mAuthTask3 = new UserCreateSSOGoogle(tokenCSFR, getBaseContext(), mGoogleApiClient);
+                public void onResponse(JSONObject response) {
+                    try {
+                        String tokenCSRF = response.get("_csrf").toString();
+                        mAuthTask3 = new UserCreateSSOGoogle(tokenCSRF, getBaseContext(), mGoogleApiClient);
                         mAuthTask3.setOnTaskFinishedEvent(new UserCreateSSOGoogle.OnTaskExecutionFinished() {
                             @Override
                             public void OnTaskFihishedEvent(HttpResponse httpResponse) {
@@ -389,11 +359,11 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                             }
                         });
                         mAuthTask3.execute();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
                 }
-
-            });
-        mAuthTask.execute();
+            }, null).run();
         }
     }
 
