@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.VolleyError;
 import com.facebook.Request;
 import com.facebook.RequestAsyncTask;
 import com.facebook.Response;
@@ -35,6 +36,7 @@ import java.util.Arrays;
 
 import eip.com.lizz.Network.GET_CSRF;
 import eip.com.lizz.Network.POST_LogUser;
+import eip.com.lizz.Network.POST_SSOFB;
 import eip.com.lizz.QueriesAPI.UserCreateSSOFb;
 import eip.com.lizz.QueriesAPI.UserCreateSSOGoogle;
 import eip.com.lizz.Utils.UAlertBox;
@@ -54,7 +56,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     private boolean mIntentInProgress;
     private boolean mSignInClicked;
     private ConnectionResult mConnectionResult;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -215,16 +216,33 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                         new GET_CSRF(HomeActivity.this, getBaseContext(), new com.android.volley.Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
-                                try {
+                                try
+                                {
                                     String tokenCSRF = response.get("_csrf").toString();
-                                    mAuthTask2 = new UserCreateSSOFb(tokenCSRF, getBaseContext(), fbAccessToken);
-                                    mAuthTask2.setOnTaskFinishedEvent(new UserCreateSSOFb.OnTaskExecutionFinished() {
+
+                                    JSONObject data = new JSONObject();
+                                    data.put("_csrf", tokenCSRF);
+                                    data.put("access_token", fbAccessToken);
+
+                                    new POST_SSOFB(HomeActivity.this, getBaseContext(), new com.android.volley.Response.Listener<JSONObject>() {
                                         @Override
-                                        public void OnTaskFihishedEvent(HttpResponse httpResponse) {
-                                            dataAPI(httpResponse, "fb");
+                                        public void onResponse(JSONObject response) {
+                                            try {
+                                                API_200(response, "fb");
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                                ssoFBTokenEmpty();
+                                            }
                                         }
-                                    });
-                                    mAuthTask2.execute();
+                                    }, new com.android.volley.Response.ErrorListener() {
+                                        @Override
+                                        public void onErrorResponse(VolleyError error) {
+                                            if (error.networkResponse.statusCode == 403)
+                                                API_403();
+                                            else
+                                                ssoFBTokenEmpty();
+                                        }
+                                    }).run(data);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -233,6 +251,15 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                     }
                 });
             }
+        }
+    }
+
+    private void ssoFBTokenEmpty()
+    {
+        UAlertBox.alertOk(HomeActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_400_sso_fb_token_empty));
+        Session session = Session.getActiveSession();
+        if (session != null) {
+            session.closeAndClearTokenInformation();
         }
     }
 
@@ -259,10 +286,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     private void data_fb(JSONObject jObj, int responseCode) throws JSONException {
         if (responseCode == 200)
             API_200(jObj, "fb");
-        else if (responseCode == 400)
-            API_400(jObj, "fb");
-        else if (responseCode == 403)
-            API_403();
     }
 
     private void data_googleplus(JSONObject jObj, int responseCode) throws JSONException {

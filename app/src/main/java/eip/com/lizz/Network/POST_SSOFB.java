@@ -16,7 +16,7 @@ import eip.com.lizz.Utils.UAlertBox;
 /**
  * Created by fortin_j on 11/12/15.
  */
-public class POST_AddUser
+public class POST_SSOFB
 {
     private String                          URL         = null;
     private Activity                        mActivity   = null;
@@ -25,15 +25,14 @@ public class POST_AddUser
     private Response.Listener<JSONObject>   mResponse   = null;
     private JsonObjectRequest               mRequest    = null;
 
-    public POST_AddUser(Activity activity, Context context, Response.Listener<JSONObject> response, Response.ErrorListener error)
+    public POST_SSOFB(Activity activity, Context context, Response.Listener<JSONObject> response, Response.ErrorListener error)
     {
         mActivity = activity;
         mContext = context;
         mError = error;
         mResponse = response;
-        URL = context.getResources().getString(R.string.url_api_komyla_no_suffix)
-                + context.getResources().getString(R.string.url_api_suffix)
-                + context.getResources().getString(R.string.url_api_createUser);
+        URL = context.getResources().getString(R.string.url_api_final_v1)
+                + context.getResources().getString(R.string.url_api_user_session_ssofb);
     }
 
     public void create(JSONObject data)
