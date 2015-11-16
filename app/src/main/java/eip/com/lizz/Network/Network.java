@@ -8,6 +8,7 @@ import com.android.volley.toolbox.Volley;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
+import java.net.CookieStore;
 
 /**
  * Created by fortin_j on 11/7/15.
@@ -18,6 +19,7 @@ public class Network {
     private static Context  mContext        = null;
 
     private RequestQueue    mRequestQueue   = null;
+    private CookieManager   mCookieManager   = null;
 
     private Network(Context context)
     {
@@ -29,12 +31,15 @@ public class Network {
     {
         if (mRequestQueue == null)
         {
-            CookieManager cookieManage = new CookieManager();
-            CookieHandler.setDefault(cookieManage);
+            mCookieManager = new CookieManager();
+            CookieHandler.setDefault(mCookieManager);
+
             mRequestQueue = Volley.newRequestQueue(mContext.getApplicationContext());
         }
         return mRequestQueue;
     }
+
+    public CookieManager getCookieManager() { return mCookieManager; }
 
     public static synchronized Network getInstance(Context context)
     {

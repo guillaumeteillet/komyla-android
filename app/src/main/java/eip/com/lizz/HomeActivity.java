@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import eip.com.lizz.Network.GET_CSRF;
+import eip.com.lizz.Network.Network;
 import eip.com.lizz.Network.POST_LogUser;
 import eip.com.lizz.Network.POST_SSOFB;
 import eip.com.lizz.QueriesAPI.UserCreateSSOFb;
@@ -117,7 +118,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                     resolveSignInError();
                 }
             });
-
         }
     }
 
@@ -150,7 +150,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-
     public void onConnectionFailed(ConnectionResult result) {
         if (!mIntentInProgress) {
             // Store the ConnectionResult so that we can use it later when the user clicks
@@ -164,7 +163,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             }
         }
     }
-
 
     protected void onStart() {
         super.onStart();
@@ -188,7 +186,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -208,7 +205,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
             session.onActivityResult(this, requestCode, resultCode, data);
             if (session.isOpened()) {
                 fbAccessToken = session.getAccessToken();
-                // make request to get facebook user info
                 RequestAsyncTask requestAsyncTask = Request.executeMeRequestAsync(session, new Request.GraphUserCallback() {
                     @Override
                     public void onCompleted(GraphUser user, Response response) {
@@ -216,8 +212,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                         new GET_CSRF(HomeActivity.this, getBaseContext(), new com.android.volley.Response.Listener<JSONObject>() {
                             @Override
                             public void onResponse(JSONObject response) {
-                                try
-                                {
+                                try {
                                     String tokenCSRF = response.get("_csrf").toString();
 
                                     JSONObject data = new JSONObject();
@@ -237,7 +232,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
                                     }, new com.android.volley.Response.ErrorListener() {
                                         @Override
                                         public void onErrorResponse(VolleyError error) {
-                                            if (error.networkResponse.statusCode == 403)
+                                            if (error != null && error.networkResponse != null && error.networkResponse.statusCode == 403)
                                                 API_403();
                                             else
                                                 ssoFBTokenEmpty();
@@ -254,8 +249,7 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-    private void ssoFBTokenEmpty()
-    {
+    private void ssoFBTokenEmpty() {
         UAlertBox.alertOk(HomeActivity.this, getResources().getString(R.string.error), getResources().getString(R.string.error_400_sso_fb_token_empty));
         Session session = Session.getActiveSession();
         if (session != null) {
@@ -298,16 +292,13 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
     }
 
     private void API_200(JSONObject jObj, String sso) throws JSONException {
-
         POST_LogUser.saveLocalParams(jObj.getString("firstname"), jObj.getString("surname"), jObj.getString("email"), jObj.getString("id"), "0;", getBaseContext());
-
         if (sso.equals("fb")) {
             Session session = Session.getActiveSession();
             if (session != null) {
                 session.closeAndClearTokenInformation();
             }
         }
-
         Intent loggedUser = new Intent(getBaseContext(), HomeLizzActivity.class);
         loggedUser.putExtra("isLoginJustNow", true);
         loggedUser.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);// On supprime les vues précédentes, l'utilisateur est connecté.
@@ -364,7 +355,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
         // TO DO : Verifier si le token Google+ existe déjà ou non
 
        /* */
-
         if (mGoogleApiClient.isConnected()) {
             new GET_CSRF(this, getBaseContext(), new com.android.volley.Response.Listener<JSONObject>() {
                 @Override
