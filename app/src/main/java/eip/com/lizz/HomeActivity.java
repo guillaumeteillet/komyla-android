@@ -35,10 +35,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import eip.com.lizz.Network.GET_CSRF;
-import eip.com.lizz.Network.Network;
 import eip.com.lizz.Network.POST_LogUser;
 import eip.com.lizz.Network.POST_SSOFB;
-import eip.com.lizz.QueriesAPI.UserCreateSSOFb;
 import eip.com.lizz.QueriesAPI.UserCreateSSOGoogle;
 import eip.com.lizz.Utils.UAlertBox;
 import eip.com.lizz.Utils.UApi;
@@ -49,7 +47,6 @@ public class HomeActivity extends FragmentActivity implements View.OnClickListen
 
     private String fbAccessToken;
     public String email;
-    private UserCreateSSOFb mAuthTask2 = null;
     private UserCreateSSOGoogle mAuthTask3 = null;
     private static final String TAG = "ExampleActivity";
     private static final int RC_SIGN_IN = 0;

@@ -59,8 +59,6 @@ public class UserCreateSSOGoogle extends AsyncTask<Void, Void, HttpResponse> {
         mGoogleApiClient = sGoogleApiClient;
     }
 
-
-
     private HttpResponse createSSOGoogleUser(String token) throws Exception {
 
         String url = _context.getResources().getString(R.string.url_api_final_v1)
