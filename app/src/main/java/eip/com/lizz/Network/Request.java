@@ -62,10 +62,20 @@ public abstract class Request
         Network.getInstance(mContext).addToRequestQueue(mRequest);
     }
 
-    public void run(JSONObject data)
+    private void _run(JSONObject data)
     {
         create(data);
         add();
+    }
+
+    public void run(JSONObject data)
+    {
+        _run(data);
+    }
+
+    public void run()
+    {
+        _run(null);
     }
 
     public Context getContext() { return mContext; }
