@@ -9,9 +9,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 
 import org.json.JSONObject;
 
-import eip.com.lizz.R;
-import eip.com.lizz.Utils.UAlertBox;
-
 /**
  * Created by fortin_j on 12/1/15.
  */
@@ -19,17 +16,15 @@ public abstract class Request
 {
     private int                             mMethod;
     private String                          URL         = null;
-    private Activity                        mActivity   = null;
     private Context                         mContext    = null;
     private Response.ErrorListener          mError      = null;
     private Response.Listener<JSONObject>   mResponse   = null;
     private JsonObjectRequest               mRequest    = null;
 
-    public Request(int method, String url, Activity activity, Context context, Response.Listener<JSONObject> response, Response.ErrorListener error)
+    public Request(int method, String url, Context context, Response.Listener<JSONObject> response, Response.ErrorListener error)
     {
         URL = url;
         mMethod = method;
-        mActivity = activity;
         mContext = context;
         mResponse = response;
         mError = error;
@@ -74,4 +69,7 @@ public abstract class Request
     }
 
     public Context getContext() { return mContext; }
+
+    public String getURL() { return URL; }
+    public void setURL(String url) { URL = url; }
 }

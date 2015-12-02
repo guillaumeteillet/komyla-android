@@ -15,18 +15,17 @@ import eip.com.lizz.R;
 /**
  * Created by fortin_j on 12/1/15.
  */
-public class POST_AddCreditCard extends Request
+public class POST_UpdateCreditCard extends Request
 {
-    public POST_AddCreditCard(final Activity activity, final Context context)
+    public POST_UpdateCreditCard(final Activity activity, final Context context, String cardId)
     {
-        super(com.android.volley.Request.Method.POST, context.getResources().getString(R.string.url_api_komyla_no_suffix) +
-                context.getResources().getString(R.string.url_api_suffix) +
-                context.getResources().getString(R.string.url_api_add_creditCard), context, new Response.Listener<JSONObject>() {
+        super(com.android.volley.Request.Method.POST, context.getResources().getString(R.string.url_api_final_v1)
+                + context.getResources().getString(R.string.url_api_update_creditCard) + cardId, context, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                    Toast.makeText(context, context.getResources().getString(R.string.toast_valid_card_infos), Toast.LENGTH_LONG).show();
-                    activity.finish();
-                }
+                Toast.makeText(context, context.getResources().getString(R.string.toast_valid_card_infos), Toast.LENGTH_LONG).show();
+                activity.finish();
+            }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -52,6 +51,6 @@ public class POST_AddCreditCard extends Request
 
     private static void notifyUnknowError(Context context)
     {
-        Toast.makeText(context, context.getResources().getString(R.string.error_add_credit_card), Toast.LENGTH_LONG).show();
+        Toast.makeText(context, context.getResources().getString(R.string.error_update_credit_card), Toast.LENGTH_LONG).show();
     }
 }

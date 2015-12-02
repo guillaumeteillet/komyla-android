@@ -195,7 +195,7 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
                                     data.put("password", password);
                                     data.put("passwordConfirmation", password);
 
-                                    new POST_AddUser(RegisterActivity.this, getBaseContext(), new Response.Listener<JSONObject>() {
+                                    new POST_AddUser(getBaseContext(), new Response.Listener<JSONObject>() {
                                         @Override
                                         public void onResponse(JSONObject response) {
                                             finish();

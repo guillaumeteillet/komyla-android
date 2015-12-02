@@ -18,11 +18,11 @@ import eip.com.lizz.Utils.UAlertBox;
  */
 public class POST_AddUser extends eip.com.lizz.Network.Request
 {
-    public POST_AddUser(Activity activity, Context context, Response.Listener<JSONObject> response, Response.ErrorListener error)
+    public POST_AddUser(Context context, Response.Listener<JSONObject> response, Response.ErrorListener error)
     {
         super(Request.Method.POST, context.getResources().getString(R.string.url_api_komyla_no_suffix)
                 + context.getResources().getString(R.string.url_api_suffix)
-                + context.getResources().getString(R.string.url_api_createUser), activity, context, response, error);
+                + context.getResources().getString(R.string.url_api_createUser), context, response, error);
     }
 }
 

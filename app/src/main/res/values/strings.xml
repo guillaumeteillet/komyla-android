@@ -228,6 +228,7 @@
     <string name="error_somme_empty">La somme a envoyer au destinataire est vide.</string>
     <string name="wrong_card_infos">Certains champs n\'ont pas été remplis ou comportent des erreurs.</string>
     <string name="error_add_credit_card">Une erreur inconnue est survenue lors de l\'ajout de votre carte.</string>
+    <string name="error_update_credit_card">Une erreur inconnue est survenue lors de la mise à jour de votre carte.</string>
     <string name="code000">Vérifiez votre connexion internet ! Le serveur d\'authentification Komyla est injoignable. Code d\'erreur Komyla : 000. Code HTTP : 118</string>
     <string name="code001">Code d\'erreur Komyla : 001. Code HTTP : 403</string>
     <string name="code002">Description : Le serveur n\'a pas reçu le prénom. Code d\'erreur Komyla : 002. Code HTTP : 400</string>

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import eip.com.lizz.Network.POST_AddCreditCard;
+import eip.com.lizz.Network.POST_UpdateCreditCard;
 import eip.com.lizz.QueriesAPI.DeleteCreditCardFromAPI;
 import eip.com.lizz.QueriesAPI.UpdateCreditCardToAPI;
 import eip.com.lizz.Utils.UAlertBox;
@@ -119,13 +120,10 @@ public class AddEditPaymentMethodActivity extends ActionBarActivity {
         edittextCryptogram = (EditText)findViewById(R.id.edittextCryptogram);
         edittextOwnerName = (EditText)findViewById(R.id.edittextOwnerName);
         edittextDisplayName = (EditText)findViewById(R.id.edittextDisplayName);
-
         scanCard = (ImageButton)findViewById(R.id.buttonScanCard);
         saveCard = (Button)findViewById(R.id.buttonSaveCard);
         deleteCard = (Button)findViewById(R.id.buttonDeleteCard);
     }
-
-
 
     private void configureButtonSaveCard(final Context context) {
         saveCard.setOnClickListener(new View.OnClickListener() {
@@ -155,7 +153,6 @@ public class AddEditPaymentMethodActivity extends ActionBarActivity {
             try
             {
                 data.put("_csrf", getApplicationContext().getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE).getString("eip.com.lizz._csrf", ""));
-
                 cardData.put("number", edittextCardNumber.getText().toString());
                 cardData.put("type", "CB");
                 cardData.put("expirationDate", edittextExpirationDateMonth.getText().toString() + edittextExpirationDateYear.getText().toString());
@@ -179,7 +176,24 @@ public class AddEditPaymentMethodActivity extends ActionBarActivity {
         if (modifiedFields.size() == 0)
             finish();
 
-        if (verifyChangedData(modifiedFields)) {
+        if (verifyChangedData(modifiedFields))
+        {
+            JSONObject data = new JSONObject();
+
+            try
+            {
+                data.put("_csrf", getApplicationContext().getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE).getString("eip.com.lizz._csrf", ""));
+                for (String key : modifiedFields.keySet())
+                    data.put(key, modifiedFields.get(key));
+
+                new POST_UpdateCreditCard(this, getBaseContext(), oldCreditCard.get_id()).run(data);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+
+/*
             SharedPreferences sharedpreferences = getApplicationContext().getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
             UpdateCreditCardToAPI task = new UpdateCreditCardToAPI(sharedpreferences.getString("eip.com.lizz._csrf", ""),
                     oldCreditCard.get_id(), getApplicationContext());
@@ -193,6 +207,7 @@ public class AddEditPaymentMethodActivity extends ActionBarActivity {
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
+            */
         }
         else {
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.wrong_card_infos), Toast.LENGTH_LONG).show();
