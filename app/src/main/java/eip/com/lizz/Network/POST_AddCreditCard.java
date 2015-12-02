@@ -41,12 +41,17 @@ public class POST_AddCreditCard extends Request
 
                     } catch (JSONException e) {
                         e.printStackTrace();
-                        Toast.makeText(context, context.getResources().getString(R.string.error_add_credit_card), Toast.LENGTH_LONG).show();
+                        notifyUnknowError(context);
                     }
                 }
                 else
-                    Toast.makeText(context, context.getResources().getString(R.string.error_add_credit_card), Toast.LENGTH_LONG).show();
+                    notifyUnknowError(context);
             }
         });
+    }
+
+    private static void notifyUnknowError(Context context)
+    {
+        Toast.makeText(context, context.getResources().getString(R.string.error_add_credit_card), Toast.LENGTH_LONG).show();
     }
 }

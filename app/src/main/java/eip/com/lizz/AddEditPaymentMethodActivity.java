@@ -163,8 +163,6 @@ public class AddEditPaymentMethodActivity extends ActionBarActivity {
                 cardData.put("default", "false");
                 data.put("cardData", cardData);
 
-                Log.e("DATA", data.toString());
-
                 new POST_AddCreditCard(this, getBaseContext()).run(data);
 
             } catch (JSONException e) {
