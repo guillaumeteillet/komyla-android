@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
 import eip.com.lizz.Network.POST_AddCreditCard;
-import eip.com.lizz.QueriesAPI.AddCreditCardToAPI;
 import eip.com.lizz.QueriesAPI.DeleteCreditCardFromAPI;
 import eip.com.lizz.QueriesAPI.UpdateCreditCardToAPI;
 import eip.com.lizz.Utils.UAlertBox;
