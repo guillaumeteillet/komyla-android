@@ -15,10 +15,14 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
+import eip.com.lizz.Network.POST_AddCreditCard;
 import eip.com.lizz.QueriesAPI.AddCreditCardToAPI;
 import eip.com.lizz.QueriesAPI.DeleteCreditCardFromAPI;
 import eip.com.lizz.QueriesAPI.UpdateCreditCardToAPI;
@@ -145,31 +149,28 @@ public class AddEditPaymentMethodActivity extends ActionBarActivity {
     }
 
     private void buttonSaveCardAdditionMode(final Context context) {
-        if (allFieldAreGood()) {
-            SharedPreferences sharedpreferences = getApplicationContext().getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
-            AddCreditCardToAPI task = new AddCreditCardToAPI(sharedpreferences.getString("eip.com.lizz._csrf", ""), getApplicationContext());
-            try {
-                String responseCode = task.execute(new eip.com.lizz.Models.CreditCard(
-                        null,
-                        edittextCardNumber.getText().toString(),
-                        edittextExpirationDateMonth.getText().toString(),
-                        edittextExpirationDateYear.getText().toString(),
-                        edittextCryptogram.getText().toString(),
-                        edittextOwnerName.getText().toString(),
-                        edittextDisplayName.getText().toString())).get();
-                if (responseCode.compareTo("200") == 0) {
-                    Toast.makeText(context, getResources().getString(R.string.toast_valid_card_infos), Toast.LENGTH_LONG).show();
-                    finish();
-                }
-                else {
-                    Toast.makeText(context, "L'api a retourné le code d'erreur " + responseCode, Toast.LENGTH_LONG).show();
-                }
-            } catch (InterruptedException | ExecutionException e) {
+        if (allFieldAreGood())
+        {
+            JSONObject data = new JSONObject();
+            JSONObject cardData = new JSONObject();
+            try
+            {
+                data.put("_csrf", getApplicationContext().getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE).getString("eip.com.lizz._csrf", ""));
+
+                cardData.put("number", edittextCardNumber.getText().toString());
+                cardData.put("type", "CB");
+                cardData.put("expirationDate", edittextExpirationDateMonth.getText().toString() + edittextExpirationDateYear.getText().toString());
+                cardData.put("cvx", edittextCryptogram.getText().toString());
+                cardData.put("default", "false");
+                data.put("cardData", cardData);
+
+                Log.e("DATA", data.toString());
+
+                new POST_AddCreditCard(this, getBaseContext()).run(data);
+
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
-        else {
-            Toast.makeText(getApplicationContext(), getResources().getString(R.string.wrong_card_infos), Toast.LENGTH_LONG).show();
         }
     }
 

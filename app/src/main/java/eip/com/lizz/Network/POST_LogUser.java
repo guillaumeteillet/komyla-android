@@ -52,6 +52,7 @@ public class POST_LogUser
                 + context.getResources().getString(R.string.url_api_suffix)
                 + context.getResources().getString(R.string.url_api_createSession);
     }
+
     public void create(JSONObject data)
     {
         mRequest = new JsonObjectRequest(Request.Method.POST, URL, data, new Response.Listener<JSONObject>() {

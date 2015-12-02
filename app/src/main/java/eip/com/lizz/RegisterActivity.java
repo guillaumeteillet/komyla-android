@@ -225,6 +225,9 @@ public class RegisterActivity extends Activity implements LoaderCallbacks<Cursor
                                     }, new Response.ErrorListener() {
                                         @Override
                                         public void onErrorResponse(VolleyError error) {
+                                            UAlertBox.alertOk(RegisterActivity.this, getBaseContext().getResources().getString(R.string.error),
+                                                    getBaseContext().getResources().getString(R.string.error_server_ok_but_fail)
+                                                            + getBaseContext().getResources().getString(R.string.code006));
                                             showProgress(false);
                                         }
                                     }).run(data);

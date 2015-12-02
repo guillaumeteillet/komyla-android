@@ -33,7 +33,6 @@ public class MainMenuActivity extends AppCompatActivity {
     private int[] whiteIconResId = { R.drawable.ic_settings_white_24dp, R.drawable.ic_shopping_basket_white_24dp,
             R.drawable.ic_history_white_24dp };
 
-    boolean scannerStatus;
     boolean isLogged, isLoginJustNow = false;
 
     @Override
@@ -43,22 +42,12 @@ public class MainMenuActivity extends AppCompatActivity {
 
         SharedPreferences sharedpreferences = getSharedPreferences("eip.com.lizz", Context.MODE_PRIVATE);
         isLogged = sharedpreferences.getBoolean("eip.com.lizz.isLogged", false);
+
         final Bundle bundle = getIntent().getExtras();
         if (bundle != null)
-        {
             isLoginJustNow = bundle.getBoolean("isLoginJustNow");
-        }
 
-        sharedpreferences.edit().putBoolean("eip.com.lizz.flash", false).apply(); // flash off
-        String firstname, surname, email, phone, id_user;
-
-        firstname = sharedpreferences.getString("eip.com.lizz.firstname", "");
-        surname = sharedpreferences.getString("eip.com.lizz.surname", "");
-        email = sharedpreferences.getString("eip.com.lizz.email", "");
-        id_user = sharedpreferences.getString("eip.com.lizz.id_user", "");
-        phone = sharedpreferences.getString("eip.com.lizz.phone", "");
-
-        Log.d("DEBUG LOL", ">>>> " + id_user + " ----- " + firstname + " -- " + surname + "-- " + email + "---" + phone + "--");
+        sharedpreferences.edit().putBoolean("eip.com.lizz.flash", false).apply();
 
         if (isLogged)
         {
